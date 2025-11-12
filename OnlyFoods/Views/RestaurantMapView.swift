@@ -13,30 +13,29 @@ struct RestaurantMapView: View {
   let longitude: Double
   let restaurantName: String
 
-  @State private var region: MKCoordinateRegion
+  @State private var cameraPosition: MapCameraPosition
 
   init(latitude: Double, longitude: Double, restaurantName: String) {
     self.latitude = latitude
     self.longitude = longitude
     self.restaurantName = restaurantName
-    _region = State(
-      initialValue: MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude),
-        span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-      ))
+    _cameraPosition = State(
+      initialValue: .region(
+        MKCoordinateRegion(
+          center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude),
+          span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+        )
+      )
+    )
   }
 
   var body: some View {
-    Map(
-      coordinateRegion: $region,
-      annotationItems: [
-        RestaurantAnnotation(
-          coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude),
-          title: restaurantName
-        )
-      ]
-    ) { annotation in
-      MapPin(coordinate: annotation.coordinate, tint: .red)
+    Map(position: $cameraPosition) {
+      Marker(
+        restaurantName,
+        coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+      )
+      .tint(.red)
     }
     .onTapGesture {
       // Open in Maps app
@@ -48,12 +47,6 @@ struct RestaurantMapView: View {
       mapItem.openInMaps()
     }
   }
-}
-
-struct RestaurantAnnotation: Identifiable {
-  let id = UUID()
-  let coordinate: CLLocationCoordinate2D
-  let title: String
 }
 
 #Preview {

@@ -9,7 +9,11 @@
     "cuisineCategory": "Cantonese",
     "averageRating": 4.5,
     "reviewCount": 128,
-    "tags": ["Dim Sum", "Roasted Meats", "Family Friendly"]
+    "tags": [
+      "Dim Sum",
+      "Roasted Meats",
+      "Family Friendly"
+    ]
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440001",
@@ -21,7 +25,11 @@
     "cuisineCategory": "Japanese",
     "averageRating": 4.8,
     "reviewCount": 95,
-    "tags": ["Sushi", "Omakase", "Fresh Fish"]
+    "tags": [
+      "Sushi",
+      "Omakase",
+      "Fresh Fish"
+    ]
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440002",
@@ -33,7 +41,11 @@
     "cuisineCategory": "Italian",
     "averageRating": 4.3,
     "reviewCount": 76,
-    "tags": ["Pasta", "Pizza", "Romantic"]
+    "tags": [
+      "Pasta",
+      "Pizza",
+      "Romantic"
+    ]
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440003",
@@ -45,7 +57,11 @@
     "cuisineCategory": "Indian",
     "averageRating": 4.6,
     "reviewCount": 112,
-    "tags": ["Curry", "Tandoori", "Vegetarian"]
+    "tags": [
+      "Curry",
+      "Tandoori",
+      "Vegetarian"
+    ]
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440004",
@@ -57,7 +73,10 @@
     "cuisineCategory": "Korean",
     "averageRating": 4.4,
     "reviewCount": 89,
-    "tags": ["BBQ", "All-You-Can-Eat", "Meat"]
+    "tags": [
+      "BBQ",
+      "All-You-Can-Eat",
+      "Meat"
+    ]
   }
 ]
-

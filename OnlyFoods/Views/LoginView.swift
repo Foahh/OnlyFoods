@@ -5,6 +5,7 @@
 //  Created by Foahh on 2025/11/12.
 //
 
+import SwiftData
 import SwiftUI
 
 struct LoginView: View {
@@ -94,6 +95,7 @@ struct LoginView: View {
       // For now, we'll just dismiss
       errorMessage = nil
       dismiss()
+      print("Login successful for user: \(user.username)")
     } else {
       errorMessage = "User not found. Please create an account."
     }
@@ -115,6 +117,9 @@ struct LoginView: View {
 }
 
 #Preview {
-  LoginView()
-    .modelContainer(for: [UserModel.self], inMemory: true)
+  let config = ModelConfiguration(isStoredInMemoryOnly: true)
+  let container = try! ModelContainer(for: UserModel.self, configurations: config)
+
+  return LoginView()
+    .modelContainer(container)
 }

@@ -6,6 +6,7 @@
 //
 
 import MapKit
+import SwiftData
 import SwiftUI
 
 struct RestaurantDetailView: View {
@@ -80,7 +81,8 @@ struct RestaurantDetailView: View {
                 }
               } label: {
                 Image(
-                  systemName: user.isFavorite(restaurantID: currentRestaurant.id) ? "heart.fill" : "heart"
+                  systemName: user.isFavorite(restaurantID: currentRestaurant.id)
+                    ? "heart.fill" : "heart"
                 )
                 .font(.title2)
                 .foregroundColor(user.isFavorite(restaurantID: currentRestaurant.id) ? .red : .gray)
@@ -179,12 +181,12 @@ struct RestaurantDetailView: View {
     .onChange(of: reviews) { _, _ in
       updateRestaurantRating()
     }
-  
+  }
+
   private func updateRestaurantRating() {
     let restaurantReviews = reviews.filter { $0.restaurantID == currentRestaurant.id }
     currentRestaurant = currentRestaurant.updateRating(from: restaurantReviews)
     restaurantService.updateRestaurantRatings(with: reviews)
-  }
   }
 }
 
@@ -271,7 +273,10 @@ struct ReviewRowView: View {
 }
 
 #Preview {
-  NavigationStack {
+  let config = ModelConfiguration(isStoredInMemoryOnly: true)
+  let container = try! ModelContainer(for: ReviewModel.self, UserModel.self, configurations: config)
+
+  return NavigationStack {
     RestaurantDetailView(
       restaurant: RestaurantModel(
         name: "Sample Restaurant",
@@ -281,5 +286,5 @@ struct ReviewRowView: View {
         cuisineCategory: "Italian"
       ))
   }
-  .modelContainer(for: [ReviewModel.self, UserModel.self], inMemory: true)
+  .modelContainer(container)
 }

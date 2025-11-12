@@ -30,7 +30,7 @@ class SampleDataSeeder {
     // Create sample reviews (using restaurant IDs from JSON)
     // These IDs match the ones in restaurants.json
     let firstRestaurantID = UUID(uuidString: "550e8400-e29b-41d4-a716-446655440000")!
-    
+
     if let firstUser = users.first {
       let reviews = [
         ReviewModel(

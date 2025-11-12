@@ -5,12 +5,11 @@
 //  Created by Foahh on 2025/11/12.
 //
 
+import SwiftData
 import SwiftUI
 
 struct MainTabView: View {
   @Environment(\.modelContext) private var modelContext
-  @Query private var restaurants: [RestaurantModel]
-  @Query private var users: [UserModel]
   @State private var selectedTab = 0
 
   var body: some View {
@@ -31,6 +30,9 @@ struct MainTabView: View {
 }
 
 #Preview {
-  MainTabView()
-    .modelContainer(for: [RestaurantModel.self, ReviewModel.self, UserModel.self], inMemory: true)
+  let config = ModelConfiguration(isStoredInMemoryOnly: true)
+  let container = try! ModelContainer(for: ReviewModel.self, UserModel.self, configurations: config)
+
+  return MainTabView()
+    .modelContainer(container)
 }
