@@ -42,6 +42,10 @@ struct ExploreTabView: View {
     return filtered
   }
 
+  func rating(for restaurant: RestaurantModel) -> RestaurantRating {
+    restaurant.rating(from: reviews)
+  }
+
   var body: some View {
     NavigationStack {
       VStack(spacing: 0) {
@@ -62,7 +66,7 @@ struct ExploreTabView: View {
                   Image(systemName: "mappin.circle.fill")
                     .foregroundColor(.red)
                     .font(.title2)
-                  Text(String(format: "%.1f", restaurant.averageRating))
+                  Text(String(format: "%.1f", rating(for: restaurant).averageRating))
                     .font(.caption2)
                     .fontWeight(.bold)
                     .padding(4)
@@ -82,7 +86,7 @@ struct ExploreTabView: View {
             NavigationLink {
               RestaurantDetailView(restaurant: restaurant)
             } label: {
-              RestaurantRowView(restaurant: restaurant)
+              RestaurantRowView(restaurant: restaurant, reviews: reviews)
             }
           }
         }
@@ -105,20 +109,17 @@ struct ExploreTabView: View {
           restaurants: restaurantService.restaurants
         )
       }
-      .onAppear {
-        // Update restaurant ratings from reviews
-        restaurantService.updateRestaurantRatings(with: reviews)
-      }
-      .onChange(of: reviews) { _, _ in
-        // Update ratings when reviews change
-        restaurantService.updateRestaurantRatings(with: reviews)
-      }
     }
   }
 }
 
 struct RestaurantRowView: View {
   let restaurant: RestaurantModel
+  let reviews: [ReviewModel]
+
+  var rating: RestaurantRating {
+    restaurant.rating(from: reviews)
+  }
 
   var body: some View {
     HStack(spacing: 12) {
@@ -157,9 +158,9 @@ struct RestaurantRowView: View {
           Image(systemName: "star.fill")
             .foregroundColor(.yellow)
             .font(.caption)
-          Text(String(format: "%.1f", restaurant.averageRating))
+          Text(String(format: "%.1f", rating.averageRating))
             .font(.caption)
-          Text("(\(restaurant.reviewCount))")
+          Text("(\(rating.reviewCount))")
             .font(.caption)
             .foregroundColor(.secondary)
         }

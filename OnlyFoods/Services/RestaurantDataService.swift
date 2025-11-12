@@ -41,11 +41,9 @@ class RestaurantDataService: ObservableObject {
     }
   }
 
-  func updateRestaurantRatings(with reviews: [ReviewModel]) {
-    restaurants = restaurants.map { restaurant in
-      let restaurantReviews = reviews.filter { $0.restaurantID == restaurant.id }
-      return restaurant.updateRating(from: restaurantReviews)
-    }
+  func getRatingDetails(for restaurantID: UUID, from reviews: [ReviewModel]) -> RestaurantRating {
+    let restaurantReviews = reviews.filter { $0.restaurantID == restaurantID }
+    return RestaurantRating.compute(from: restaurantReviews)
   }
 
   func getRestaurant(by id: UUID) -> RestaurantModel? {

@@ -10,11 +10,15 @@ import SwiftUI
 
 struct ProfileTabView: View {
   @Environment(\.modelContext) private var modelContext
+  @EnvironmentObject private var userManager: UserManager
   @Query private var users: [UserModel]
   @Query private var reviews: [ReviewModel]
   @StateObject private var restaurantService = RestaurantDataService.shared
-  @State private var currentUser: UserModel?
-  @State private var showLoginView = false
+  @State private var showAuthView = false
+
+  private var currentUser: UserModel? {
+    userManager.currentUser
+  }
 
   var userReviews: [ReviewModel] {
     guard let user = currentUser else { return [] }
@@ -86,7 +90,7 @@ struct ProfileTabView: View {
                       NavigationLink {
                         RestaurantDetailView(restaurant: restaurant)
                       } label: {
-                        FavoriteRestaurantCard(restaurant: restaurant)
+                        FavoriteRestaurantCard(restaurant: restaurant, reviews: reviews)
                       }
                     }
                   }
@@ -130,7 +134,7 @@ struct ProfileTabView: View {
 
             // Logout Button
             Button {
-              currentUser = nil
+              userManager.logout()
             } label: {
               Text("Logout")
                 .font(.headline)
@@ -155,7 +159,7 @@ struct ProfileTabView: View {
             .foregroundColor(.secondary)
 
           Button {
-            showLoginView = true
+            showAuthView = true
           } label: {
             Text("Login")
               .font(.headline)
@@ -167,16 +171,14 @@ struct ProfileTabView: View {
           }
         }
         .navigationTitle("Profile")
-        .sheet(isPresented: $showLoginView) {
-          LoginView()
+        .sheet(isPresented: $showAuthView) {
+          AuthView()
         }
       }
     }
     .onAppear {
-      // Get current user (in a real app, this would come from authentication)
-      currentUser = users.first
-      if currentUser == nil {
-        showLoginView = true
+      if userManager.currentUser == nil {
+        showAuthView = true
       }
     }
   }
@@ -184,6 +186,11 @@ struct ProfileTabView: View {
 
 struct FavoriteRestaurantCard: View {
   let restaurant: RestaurantModel
+  let reviews: [ReviewModel]
+
+  var rating: RestaurantRating {
+    restaurant.rating(from: reviews)
+  }
 
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
@@ -218,7 +225,7 @@ struct FavoriteRestaurantCard: View {
         Image(systemName: "star.fill")
           .foregroundColor(.yellow)
           .font(.caption)
-        Text(String(format: "%.1f", restaurant.averageRating))
+        Text(String(format: "%.1f", rating.averageRating))
           .font(.caption)
       }
     }
