@@ -1,5 +1,5 @@
 //
-//  RestaurantDataService.swift
+//  RestaurantService.swift
 //  OnlyFoods
 //
 //  Created by Foahh on 2025/11/12.
@@ -8,12 +8,12 @@
 import Combine
 import Foundation
 
-class RestaurantDataService: ObservableObject {
+class RestaurantService: ObservableObject {
   @Published var restaurants: [RestaurantModel] = []
   @Published var isLoading = false
   @Published var errorMessage: String?
 
-  static let shared = RestaurantDataService()
+  static let shared = RestaurantService()
 
   private init() {
     loadRestaurants()

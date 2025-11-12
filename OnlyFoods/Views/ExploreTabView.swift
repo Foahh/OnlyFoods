@@ -12,7 +12,7 @@ import SwiftUI
 struct ExploreTabView: View {
   @Environment(\.modelContext) private var modelContext
   @Query private var reviews: [ReviewModel]
-  @StateObject private var restaurantService = RestaurantDataService.shared
+  @StateObject private var restaurantService = RestaurantService.shared
   @State private var selectedRestaurant: RestaurantModel?
   @State private var cameraPosition: MapCameraPosition = .region(
     MKCoordinateRegion(
