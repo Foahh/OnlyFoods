@@ -8,65 +8,70 @@
     "images": [],
     "cuisineCategory": "Cantonese",
     "tags": [
-      "Dim Sum",
-      "Roasted Meats",
-      "Family Friendly"
-    ]
-  },
-  {
-    "id": "550e8400-e29b-41d4-a716-446655440001",
-    "name": "Tokyo Sushi Bar",
-    "description": "Fresh sushi and sashimi prepared by experienced Japanese chefs. Omakase available.",
-    "latitude": 22.3210,
-    "longitude": 114.1700,
-    "images": [],
-    "cuisineCategory": "Japanese",
-    "tags": [
-      "Sushi",
-      "Omakase",
-      "Fresh Fish"
-    ]
-  },
-  {
-    "id": "550e8400-e29b-41d4-a716-446655440002",
-    "name": "Bella Italia",
-    "description": "Traditional Italian dishes made with imported ingredients. Cozy atmosphere perfect for dates.",
-    "latitude": 22.3170,
-    "longitude": 114.1680,
-    "images": [],
-    "cuisineCategory": "Italian",
-    "tags": [
-      "Pasta",
-      "Pizza",
-      "Romantic"
-    ]
-  },
-  {
-    "id": "550e8400-e29b-41d4-a716-446655440003",
-    "name": "Spice Garden",
-    "description": "Authentic Indian curries and tandoori dishes. Vegetarian options available.",
-    "latitude": 22.3220,
-    "longitude": 114.1710,
-    "images": [],
-    "cuisineCategory": "Indian",
-    "tags": [
-      "Curry",
-      "Tandoori",
-      "Vegetarian"
-    ]
-  },
-  {
-    "id": "550e8400-e29b-41d4-a716-446655440004",
-    "name": "BBQ Master",
-    "description": "Korean BBQ with premium meats. All-you-can-eat option available.",
-    "latitude": 22.3180,
-    "longitude": 114.1690,
-    "images": [],
-    "cuisineCategory": "Korean",
-    "tags": [
-      "BBQ",
-      "All-You-Can-Eat",
-      "Meat"
-    ]
+      "dimSum",
+      "roastedMeats",
+      "familyFriendly"
+    ],
+    "services": [
+      "wifi",
+      "parking",
+      "airConditioning",
+      "wheelchairAccessible",
+      "privateDiningRoom",
+      "takeout"
+    ],
+    "paymentMethods": [
+      "cash",
+      "creditCard",
+      "debitCard",
+      "alipay",
+      "weChatPay"
+    ],
+    "contactPhone": "+852 2123 4567",
+    "addressString": "123 Central Street, Central, Hong Kong",
+    "businessHours": {
+      "monday": [
+        {
+          "open": "11:00",
+          "close": "22:00"
+        }
+      ],
+      "tuesday": [
+        {
+          "open": "11:00",
+          "close": "22:00"
+        }
+      ],
+      "wednesday": [
+        {
+          "open": "11:00",
+          "close": "22:00"
+        }
+      ],
+      "thursday": [
+        {
+          "open": "11:00",
+          "close": "22:00"
+        }
+      ],
+      "friday": [
+        {
+          "open": "11:00",
+          "close": "23:00"
+        }
+      ],
+      "saturday": [
+        {
+          "open": "10:00",
+          "close": "23:00"
+        }
+      ],
+      "sunday": [
+        {
+          "open": "10:00",
+          "close": "22:00"
+        }
+      ]
+    }
   }
 ]
