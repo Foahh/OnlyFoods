@@ -5,6 +5,7 @@
 //  Created by Foahh on 2025/11/12.
 //
 
+import SwiftData
 import SwiftUI
 
 struct AddReviewView: View {
@@ -82,7 +83,10 @@ struct AddReviewView: View {
 }
 
 #Preview {
-  AddReviewView(
+  let config = ModelConfiguration(isStoredInMemoryOnly: true)
+  let container = try! ModelContainer(for: ReviewModel.self, UserModel.self, configurations: config)
+
+  return AddReviewView(
     restaurant: RestaurantModel(
       name: "Sample Restaurant",
       description: "A great place",
@@ -92,5 +96,5 @@ struct AddReviewView: View {
     ),
     user: UserModel(username: "TestUser")
   )
-  .modelContainer(for: [ReviewModel.self, UserModel.self], inMemory: true)
+  .modelContainer(container)
 }

@@ -6,6 +6,7 @@
 //
 
 import MapKit
+import SwiftData
 import SwiftUI
 
 struct ExploreTabView: View {
@@ -13,9 +14,11 @@ struct ExploreTabView: View {
   @Query private var reviews: [ReviewModel]
   @StateObject private var restaurantService = RestaurantDataService.shared
   @State private var selectedRestaurant: RestaurantModel?
-  @State private var region = MKCoordinateRegion(
-    center: CLLocationCoordinate2D(latitude: 22.3193, longitude: 114.1694),  // Default to Hong Kong
-    span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+  @State private var cameraPosition: MapCameraPosition = .region(
+    MKCoordinateRegion(
+      center: CLLocationCoordinate2D(latitude: 22.3193, longitude: 114.1694),  // Default to Hong Kong
+      span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+    )
   )
   @State private var showSearchView = false
   @State private var searchText = ""
@@ -43,27 +46,30 @@ struct ExploreTabView: View {
     NavigationStack {
       VStack(spacing: 0) {
         // Map View
-        Map(coordinateRegion: $region, annotationItems: filteredRestaurants) { restaurant in
-          MapAnnotation(
-            coordinate: CLLocationCoordinate2D(
-              latitude: restaurant.latitude,
-              longitude: restaurant.longitude
-            )
-          ) {
-            Button {
-              selectedRestaurant = restaurant
-            } label: {
-              VStack(spacing: 4) {
-                Image(systemName: "mappin.circle.fill")
-                  .foregroundColor(.red)
-                  .font(.title2)
-                Text(String(format: "%.1f", restaurant.averageRating))
-                  .font(.caption2)
-                  .fontWeight(.bold)
-                  .padding(4)
-                  .background(Color.white)
-                  .cornerRadius(4)
-                  .shadow(radius: 2)
+        Map(position: $cameraPosition) {
+          ForEach(filteredRestaurants) { restaurant in
+            Annotation(
+              restaurant.name,
+              coordinate: CLLocationCoordinate2D(
+                latitude: restaurant.latitude,
+                longitude: restaurant.longitude
+              )
+            ) {
+              Button {
+                selectedRestaurant = restaurant
+              } label: {
+                VStack(spacing: 4) {
+                  Image(systemName: "mappin.circle.fill")
+                    .foregroundColor(.red)
+                    .font(.title2)
+                  Text(String(format: "%.1f", restaurant.averageRating))
+                    .font(.caption2)
+                    .fontWeight(.bold)
+                    .padding(4)
+                    .background(Color.white)
+                    .cornerRadius(4)
+                    .shadow(radius: 2)
+                }
               }
             }
           }
@@ -182,6 +188,9 @@ struct RestaurantRowView: View {
 }
 
 #Preview {
-  ExploreTabView()
-    .modelContainer(for: [ReviewModel.self, UserModel.self], inMemory: true)
+  let config = ModelConfiguration(isStoredInMemoryOnly: true)
+  let container = try! ModelContainer(for: ReviewModel.self, UserModel.self, configurations: config)
+
+  return ExploreTabView()
+    .modelContainer(container)
 }

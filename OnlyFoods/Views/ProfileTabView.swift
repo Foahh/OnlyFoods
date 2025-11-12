@@ -5,6 +5,7 @@
 //  Created by Foahh on 2025/11/12.
 //
 
+import SwiftData
 import SwiftUI
 
 struct ProfileTabView: View {
@@ -263,6 +264,9 @@ struct UserReviewRowView: View {
 }
 
 #Preview {
-  ProfileTabView()
-    .modelContainer(for: [ReviewModel.self, UserModel.self], inMemory: true)
+  let config = ModelConfiguration(isStoredInMemoryOnly: true)
+  let container = try! ModelContainer(for: ReviewModel.self, UserModel.self, configurations: config)
+
+  return ProfileTabView()
+    .modelContainer(container)
 }

@@ -5,6 +5,7 @@
 //  Created by Foahh on 2025/11/12.
 //
 
+import Combine
 import Foundation
 
 class RestaurantDataService: ObservableObject {
@@ -51,4 +52,3 @@ class RestaurantDataService: ObservableObject {
     restaurants.first { $0.id == id }
   }
 }
-
