@@ -6,11 +6,9 @@
 //
 
 import Foundation
-import SwiftData
 
-@Model
-final class RestaurantModel {
-  @Attribute(.unique) var id: UUID
+struct RestaurantModel: Codable, Identifiable {
+  var id: UUID
   var name: String
   var description: String
   var latitude: Double
@@ -20,7 +18,6 @@ final class RestaurantModel {
   var averageRating: Double
   var reviewCount: Int
   var tags: [String]
-  @Relationship(deleteRule: .cascade) var reviews: [ReviewModel]?
 
   init(
     id: UUID = UUID(),
@@ -44,18 +41,38 @@ final class RestaurantModel {
     self.averageRating = averageRating
     self.reviewCount = reviewCount
     self.tags = tags
-    self.reviews = []
   }
 
-  func updateRating() {
-    guard let reviews = reviews, !reviews.isEmpty else {
-      averageRating = 0.0
-      reviewCount = 0
-      return
+  func updateRating(from reviews: [ReviewModel]) -> RestaurantModel {
+    guard !reviews.isEmpty else {
+      return RestaurantModel(
+        id: id,
+        name: name,
+        description: description,
+        latitude: latitude,
+        longitude: longitude,
+        images: images,
+        cuisineCategory: cuisineCategory,
+        averageRating: 0.0,
+        reviewCount: 0,
+        tags: tags
+      )
     }
 
     let totalRating = reviews.reduce(0.0) { $0 + Double($1.rating) }
-    averageRating = totalRating / Double(reviews.count)
-    reviewCount = reviews.count
+    let newAverageRating = totalRating / Double(reviews.count)
+
+    return RestaurantModel(
+      id: id,
+      name: name,
+      description: description,
+      latitude: latitude,
+      longitude: longitude,
+      images: images,
+      cuisineCategory: cuisineCategory,
+      averageRating: newAverageRating,
+      reviewCount: reviews.count,
+      tags: tags
+    )
   }
 }

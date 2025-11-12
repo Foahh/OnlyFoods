@@ -12,7 +12,6 @@ import SwiftUI
 struct OfApp: App {
   var sharedModelContainer: ModelContainer = {
     let schema = Schema([
-      RestaurantModel.self,
       ReviewModel.self,
       UserModel.self,
     ])
@@ -29,7 +28,8 @@ struct OfApp: App {
     WindowGroup {
       MainTabView()
         .onAppear {
-          // Seed sample data on first launch
+          // Seed sample users and reviews on first launch
+          // Restaurants are loaded from JSON
           SampleDataSeeder.seedData(modelContext: sharedModelContainer.mainContext)
         }
     }

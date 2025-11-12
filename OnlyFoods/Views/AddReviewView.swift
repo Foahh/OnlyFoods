@@ -75,8 +75,7 @@ struct AddReviewView: View {
     )
 
     modelContext.insert(review)
-    restaurant.reviews?.append(review)
-    restaurant.updateRating()
+    // Rating will be updated automatically via onChange in RestaurantDetailView
 
     dismiss()
   }
@@ -93,5 +92,5 @@ struct AddReviewView: View {
     ),
     user: UserModel(username: "TestUser")
   )
-  .modelContainer(for: [RestaurantModel.self, ReviewModel.self, UserModel.self], inMemory: true)
+  .modelContainer(for: [ReviewModel.self, UserModel.self], inMemory: true)
 }

@@ -12,13 +12,17 @@ struct RestaurantDetailView: View {
   @Environment(\.modelContext) private var modelContext
   @Query private var reviews: [ReviewModel]
   @Query private var users: [UserModel]
+  @StateObject private var restaurantService = RestaurantDataService.shared
   @State private var currentUser: UserModel?
   @State private var showAddReview = false
+  @State private var currentRestaurant: RestaurantModel
 
-  let restaurant: RestaurantModel
+  init(restaurant: RestaurantModel) {
+    _currentRestaurant = State(initialValue: restaurant)
+  }
 
   var restaurantReviews: [ReviewModel] {
-    reviews.filter { $0.restaurantID == restaurant.id }
+    reviews.filter { $0.restaurantID == currentRestaurant.id }
       .sorted { $0.timestamp > $1.timestamp }
   }
 
@@ -26,10 +30,10 @@ struct RestaurantDetailView: View {
     ScrollView {
       VStack(alignment: .leading, spacing: 16) {
         // Images
-        if !restaurant.images.isEmpty {
+        if !currentRestaurant.images.isEmpty {
           ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
-              ForEach(restaurant.images, id: \.self) { imageURL in
+              ForEach(currentRestaurant.images, id: \.self) { imageURL in
                 AsyncImage(url: URL(string: imageURL)) { image in
                   image
                     .resizable()
@@ -50,16 +54,16 @@ struct RestaurantDetailView: View {
           // Name and Rating
           HStack {
             VStack(alignment: .leading, spacing: 4) {
-              Text(restaurant.name)
+              Text(currentRestaurant.name)
                 .font(.largeTitle)
                 .fontWeight(.bold)
 
               HStack(spacing: 4) {
                 Image(systemName: "star.fill")
                   .foregroundColor(.yellow)
-                Text(String(format: "%.1f", restaurant.averageRating))
+                Text(String(format: "%.1f", currentRestaurant.averageRating))
                   .font(.title3)
-                Text("(\(restaurant.reviewCount) reviews)")
+                Text("(\(currentRestaurant.reviewCount) reviews)")
                   .font(.subheadline)
                   .foregroundColor(.secondary)
               }
@@ -69,30 +73,30 @@ struct RestaurantDetailView: View {
 
             if let user = currentUser {
               Button {
-                if user.isFavorite(restaurantID: restaurant.id) {
-                  user.removeFavorite(restaurantID: restaurant.id)
+                if user.isFavorite(restaurantID: currentRestaurant.id) {
+                  user.removeFavorite(restaurantID: currentRestaurant.id)
                 } else {
-                  user.addFavorite(restaurantID: restaurant.id)
+                  user.addFavorite(restaurantID: currentRestaurant.id)
                 }
               } label: {
                 Image(
-                  systemName: user.isFavorite(restaurantID: restaurant.id) ? "heart.fill" : "heart"
+                  systemName: user.isFavorite(restaurantID: currentRestaurant.id) ? "heart.fill" : "heart"
                 )
                 .font(.title2)
-                .foregroundColor(user.isFavorite(restaurantID: restaurant.id) ? .red : .gray)
+                .foregroundColor(user.isFavorite(restaurantID: currentRestaurant.id) ? .red : .gray)
               }
             }
           }
 
           // Category and Tags
-          Text(restaurant.cuisineCategory)
+          Text(currentRestaurant.cuisineCategory)
             .font(.headline)
             .foregroundColor(.blue)
 
-          if !restaurant.tags.isEmpty {
+          if !currentRestaurant.tags.isEmpty {
             ScrollView(.horizontal, showsIndicators: false) {
               HStack(spacing: 8) {
-                ForEach(restaurant.tags, id: \.self) { tag in
+                ForEach(currentRestaurant.tags, id: \.self) { tag in
                   Text(tag)
                     .font(.subheadline)
                     .padding(.horizontal, 12)
@@ -110,7 +114,7 @@ struct RestaurantDetailView: View {
           // Description
           Text("About")
             .font(.headline)
-          Text(restaurant.description)
+          Text(currentRestaurant.description)
             .font(.body)
             .foregroundColor(.secondary)
 
@@ -120,9 +124,9 @@ struct RestaurantDetailView: View {
           Text("Location")
             .font(.headline)
           RestaurantMapView(
-            latitude: restaurant.latitude,
-            longitude: restaurant.longitude,
-            restaurantName: restaurant.name
+            latitude: currentRestaurant.latitude,
+            longitude: currentRestaurant.longitude,
+            restaurantName: currentRestaurant.name
           )
           .frame(height: 200)
           .cornerRadius(12)
@@ -164,13 +168,23 @@ struct RestaurantDetailView: View {
     .navigationBarTitleDisplayMode(.inline)
     .sheet(isPresented: $showAddReview) {
       if let user = currentUser {
-        AddReviewView(restaurant: restaurant, user: user)
+        AddReviewView(restaurant: currentRestaurant, user: user)
       }
     }
     .onAppear {
       // Get current user (in a real app, this would come from authentication)
       currentUser = users.first
+      updateRestaurantRating()
     }
+    .onChange(of: reviews) { _, _ in
+      updateRestaurantRating()
+    }
+  
+  private func updateRestaurantRating() {
+    let restaurantReviews = reviews.filter { $0.restaurantID == currentRestaurant.id }
+    currentRestaurant = currentRestaurant.updateRating(from: restaurantReviews)
+    restaurantService.updateRestaurantRatings(with: reviews)
+  }
   }
 }
 
@@ -267,5 +281,5 @@ struct ReviewRowView: View {
         cuisineCategory: "Italian"
       ))
   }
-  .modelContainer(for: [RestaurantModel.self, ReviewModel.self, UserModel.self], inMemory: true)
+  .modelContainer(for: [ReviewModel.self, UserModel.self], inMemory: true)
 }
