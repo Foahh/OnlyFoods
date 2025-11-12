@@ -1,5 +1,5 @@
 //
-//  LoginView.swift
+//  AuthView.swift
 //  OnlyFoods
 //
 //  Created by Foahh on 2025/11/12.
@@ -8,9 +8,10 @@
 import SwiftData
 import SwiftUI
 
-struct LoginView: View {
+struct AuthView: View {
   @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss
+  @EnvironmentObject private var userManager: UserManager
   @Query private var users: [UserModel]
 
   @State private var username: String = ""
@@ -91,8 +92,7 @@ struct LoginView: View {
 
   private func login() {
     if let user = users.first(where: { $0.username.lowercased() == username.lowercased() }) {
-      // In a real app, you would set this as the current authenticated user
-      // For now, we'll just dismiss
+      userManager.setCurrentUser(user)
       errorMessage = nil
       dismiss()
       print("Login successful for user: \(user.username)")
@@ -109,9 +109,8 @@ struct LoginView: View {
 
     let newUser = UserModel(username: username)
     modelContext.insert(newUser)
+    userManager.setCurrentUser(newUser)
     errorMessage = nil
-
-    // In a real app, you would set this as the current authenticated user
     dismiss()
   }
 }
@@ -119,7 +118,9 @@ struct LoginView: View {
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
   let container = try! ModelContainer(for: UserModel.self, configurations: config)
+  let userManager = UserManager()
 
-  return LoginView()
+  AuthView()
     .modelContainer(container)
+    .environmentObject(userManager)
 }

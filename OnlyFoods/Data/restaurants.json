@@ -7,8 +7,6 @@
     "longitude": 114.1694,
     "images": [],
     "cuisineCategory": "Cantonese",
-    "averageRating": 4.5,
-    "reviewCount": 128,
     "tags": [
       "Dim Sum",
       "Roasted Meats",
@@ -23,8 +21,6 @@
     "longitude": 114.1700,
     "images": [],
     "cuisineCategory": "Japanese",
-    "averageRating": 4.8,
-    "reviewCount": 95,
     "tags": [
       "Sushi",
       "Omakase",
@@ -39,8 +35,6 @@
     "longitude": 114.1680,
     "images": [],
     "cuisineCategory": "Italian",
-    "averageRating": 4.3,
-    "reviewCount": 76,
     "tags": [
       "Pasta",
       "Pizza",
@@ -55,8 +49,6 @@
     "longitude": 114.1710,
     "images": [],
     "cuisineCategory": "Indian",
-    "averageRating": 4.6,
-    "reviewCount": 112,
     "tags": [
       "Curry",
       "Tandoori",
@@ -71,8 +63,6 @@
     "longitude": 114.1690,
     "images": [],
     "cuisineCategory": "Korean",
-    "averageRating": 4.4,
-    "reviewCount": 89,
     "tags": [
       "BBQ",
       "All-You-Can-Eat",

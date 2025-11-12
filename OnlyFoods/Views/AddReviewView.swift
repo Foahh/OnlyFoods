@@ -42,7 +42,7 @@ struct AddReviewView: View {
         }
 
         Section("Photos") {
-          // In a real app, you would implement image picker here
+          // TODO: Implement image picker and camera here
           Text("Image picker would go here")
             .foregroundColor(.secondary)
             .font(.caption)
@@ -76,7 +76,6 @@ struct AddReviewView: View {
     )
 
     modelContext.insert(review)
-    // Rating will be updated automatically via onChange in RestaurantDetailView
 
     dismiss()
   }
@@ -86,13 +85,13 @@ struct AddReviewView: View {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
   let container = try! ModelContainer(for: ReviewModel.self, UserModel.self, configurations: config)
 
-  return AddReviewView(
+  AddReviewView(
     restaurant: RestaurantModel(
       name: "Sample Restaurant",
       description: "A great place",
       latitude: 22.3193,
       longitude: 114.1694,
-      cuisineCategory: "Italian"
+      cuisineCategory: "Italian",
     ),
     user: UserModel(username: "TestUser")
   )

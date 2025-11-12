@@ -11,12 +11,16 @@ import SwiftUI
 
 struct RestaurantDetailView: View {
   @Environment(\.modelContext) private var modelContext
+  @EnvironmentObject private var userManager: UserManager
   @Query private var reviews: [ReviewModel]
   @Query private var users: [UserModel]
   @StateObject private var restaurantService = RestaurantDataService.shared
-  @State private var currentUser: UserModel?
   @State private var showAddReview = false
   @State private var currentRestaurant: RestaurantModel
+
+  private var currentUser: UserModel? {
+    userManager.currentUser
+  }
 
   init(restaurant: RestaurantModel) {
     _currentRestaurant = State(initialValue: restaurant)
@@ -25,6 +29,10 @@ struct RestaurantDetailView: View {
   var restaurantReviews: [ReviewModel] {
     reviews.filter { $0.restaurantID == currentRestaurant.id }
       .sorted { $0.timestamp > $1.timestamp }
+  }
+
+  var rating: RestaurantRating {
+    currentRestaurant.rating(from: reviews)
   }
 
   var body: some View {
@@ -62,9 +70,9 @@ struct RestaurantDetailView: View {
               HStack(spacing: 4) {
                 Image(systemName: "star.fill")
                   .foregroundColor(.yellow)
-                Text(String(format: "%.1f", currentRestaurant.averageRating))
+                Text(String(format: "%.1f", rating.averageRating))
                   .font(.title3)
-                Text("(\(currentRestaurant.reviewCount) reviews)")
+                Text("(\(rating.reviewCount) reviews)")
                   .font(.subheadline)
                   .foregroundColor(.secondary)
               }
@@ -173,20 +181,6 @@ struct RestaurantDetailView: View {
         AddReviewView(restaurant: currentRestaurant, user: user)
       }
     }
-    .onAppear {
-      // Get current user (in a real app, this would come from authentication)
-      currentUser = users.first
-      updateRestaurantRating()
-    }
-    .onChange(of: reviews) { _, _ in
-      updateRestaurantRating()
-    }
-  }
-
-  private func updateRestaurantRating() {
-    let restaurantReviews = reviews.filter { $0.restaurantID == currentRestaurant.id }
-    currentRestaurant = currentRestaurant.updateRating(from: restaurantReviews)
-    restaurantService.updateRestaurantRatings(with: reviews)
   }
 }
 
@@ -276,7 +270,7 @@ struct ReviewRowView: View {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
   let container = try! ModelContainer(for: ReviewModel.self, UserModel.self, configurations: config)
 
-  return NavigationStack {
+  NavigationStack {
     RestaurantDetailView(
       restaurant: RestaurantModel(
         name: "Sample Restaurant",
