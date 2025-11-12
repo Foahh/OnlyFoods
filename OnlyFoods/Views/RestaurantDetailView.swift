@@ -14,7 +14,7 @@ struct RestaurantDetailView: View {
   @EnvironmentObject private var userManager: UserManager
   @Query private var reviews: [ReviewModel]
   @Query private var users: [UserModel]
-  @StateObject private var restaurantService = RestaurantDataService.shared
+  @StateObject private var restaurantService = RestaurantService.shared
   @State private var showAddReview = false
   @State private var currentRestaurant: RestaurantModel
 

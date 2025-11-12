@@ -13,7 +13,7 @@ struct ProfileTabView: View {
   @EnvironmentObject private var userManager: UserManager
   @Query private var users: [UserModel]
   @Query private var reviews: [ReviewModel]
-  @StateObject private var restaurantService = RestaurantDataService.shared
+  @StateObject private var restaurantService = RestaurantService.shared
   @State private var showAuthView = false
 
   private var currentUser: UserModel? {

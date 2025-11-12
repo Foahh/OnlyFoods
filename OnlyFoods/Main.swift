@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 @main
-struct OfApp: App {
+struct Main: App {
   @StateObject private var userManager = UserManager()
 
   var sharedModelContainer: ModelContainer = {
