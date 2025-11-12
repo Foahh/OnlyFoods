@@ -10,8 +10,8 @@ import SwiftUI
 struct ProfileTabView: View {
   @Environment(\.modelContext) private var modelContext
   @Query private var users: [UserModel]
-  @Query private var restaurants: [RestaurantModel]
   @Query private var reviews: [ReviewModel]
+  @StateObject private var restaurantService = RestaurantDataService.shared
   @State private var currentUser: UserModel?
   @State private var showLoginView = false
 
@@ -23,7 +23,7 @@ struct ProfileTabView: View {
 
   var favoriteRestaurants: [RestaurantModel] {
     guard let user = currentUser else { return [] }
-    return restaurants.filter { user.isFavorite(restaurantID: $0.id) }
+    return restaurantService.restaurants.filter { user.isFavorite(restaurantID: $0.id) }
   }
 
   var body: some View {
@@ -114,11 +114,11 @@ struct ProfileTabView: View {
               } else {
                 ForEach(userReviews) { review in
                   NavigationLink {
-                    if let restaurant = restaurants.first(where: { $0.id == review.restaurantID }) {
+                    if let restaurant = restaurantService.getRestaurant(by: review.restaurantID) {
                       RestaurantDetailView(restaurant: restaurant)
                     }
                   } label: {
-                    UserReviewRowView(review: review, restaurants: restaurants)
+                    UserReviewRowView(review: review, restaurants: restaurantService.restaurants)
                   }
                 }
                 .padding(.horizontal)
@@ -264,5 +264,5 @@ struct UserReviewRowView: View {
 
 #Preview {
   ProfileTabView()
-    .modelContainer(for: [RestaurantModel.self, ReviewModel.self, UserModel.self], inMemory: true)
+    .modelContainer(for: [ReviewModel.self, UserModel.self], inMemory: true)
 }

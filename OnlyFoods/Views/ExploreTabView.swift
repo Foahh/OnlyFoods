@@ -10,7 +10,8 @@ import SwiftUI
 
 struct ExploreTabView: View {
   @Environment(\.modelContext) private var modelContext
-  @Query private var restaurants: [RestaurantModel]
+  @Query private var reviews: [ReviewModel]
+  @StateObject private var restaurantService = RestaurantDataService.shared
   @State private var selectedRestaurant: RestaurantModel?
   @State private var region = MKCoordinateRegion(
     center: CLLocationCoordinate2D(latitude: 22.3193, longitude: 114.1694),  // Default to Hong Kong
@@ -21,7 +22,7 @@ struct ExploreTabView: View {
   @State private var selectedCategory: String?
 
   var filteredRestaurants: [RestaurantModel] {
-    var filtered = restaurants
+    var filtered = restaurantService.restaurants
 
     if !searchText.isEmpty {
       filtered = filtered.filter { restaurant in
@@ -95,8 +96,16 @@ struct ExploreTabView: View {
         SearchView(
           searchText: $searchText,
           selectedCategory: $selectedCategory,
-          restaurants: restaurants
+          restaurants: restaurantService.restaurants
         )
+      }
+      .onAppear {
+        // Update restaurant ratings from reviews
+        restaurantService.updateRestaurantRatings(with: reviews)
+      }
+      .onChange(of: reviews) { _, _ in
+        // Update ratings when reviews change
+        restaurantService.updateRestaurantRatings(with: reviews)
       }
     }
   }
@@ -174,5 +183,5 @@ struct RestaurantRowView: View {
 
 #Preview {
   ExploreTabView()
-    .modelContainer(for: [RestaurantModel.self, ReviewModel.self, UserModel.self], inMemory: true)
+    .modelContainer(for: [ReviewModel.self, UserModel.self], inMemory: true)
 }
