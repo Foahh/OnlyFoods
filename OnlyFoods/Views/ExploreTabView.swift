@@ -122,9 +122,20 @@ struct RestaurantRowView: View {
 
   var body: some View {
     HStack(spacing: 12) {
-      // Restaurant Image
-      if let firstImage = restaurant.images.first {
-        AsyncImage(url: URL(string: firstImage)) { image in
+      // Restaurant Image - prefer doorImage, fallback to first image
+      if let doorImage = restaurant.doorImage, let doorImageURL = URL(string: doorImage) {
+        AsyncImage(url: doorImageURL) { image in
+          image
+            .resizable()
+            .aspectRatio(contentMode: .fill)
+        } placeholder: {
+          Rectangle()
+            .fill(Color.gray.opacity(0.3))
+        }
+        .frame(width: 80, height: 80)
+        .cornerRadius(8)
+      } else if let firstImage = restaurant.images.first, let firstImageURL = URL(string: firstImage) {
+        AsyncImage(url: firstImageURL) { image in
           image
             .resizable()
             .aspectRatio(contentMode: .fill)

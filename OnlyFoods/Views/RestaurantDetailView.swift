@@ -38,12 +38,13 @@ struct RestaurantDetailView: View {
   var body: some View {
     ScrollView {
       VStack(alignment: .leading, spacing: 16) {
-        // Images
-        if !currentRestaurant.images.isEmpty {
+        // Images - show doorImage first if available, then other images
+        if currentRestaurant.doorImage != nil || !currentRestaurant.images.isEmpty {
           ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
-              ForEach(currentRestaurant.images, id: \.self) { imageURL in
-                AsyncImage(url: URL(string: imageURL)) { image in
+              // Show doorImage first if available
+              if let doorImage = currentRestaurant.doorImage, let doorImageURL = URL(string: doorImage) {
+                AsyncImage(url: doorImageURL) { image in
                   image
                     .resizable()
                     .aspectRatio(contentMode: .fill)
@@ -53,6 +54,22 @@ struct RestaurantDetailView: View {
                 }
                 .frame(width: 300, height: 200)
                 .cornerRadius(12)
+              }
+              
+              // Show other images
+              ForEach(currentRestaurant.images, id: \.self) { imageURL in
+                if let url = URL(string: imageURL) {
+                  AsyncImage(url: url) { image in
+                    image
+                      .resizable()
+                      .aspectRatio(contentMode: .fill)
+                  } placeholder: {
+                    Rectangle()
+                      .fill(Color.gray.opacity(0.3))
+                  }
+                  .frame(width: 300, height: 200)
+                  .cornerRadius(12)
+                }
               }
             }
             .padding(.horizontal)
