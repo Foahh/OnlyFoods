@@ -31,10 +31,6 @@ struct Main: App {
       MainTabView()
         .environmentObject(userManager)
         .onAppear {
-          // Seed sample users and reviews on first launch
-          // Restaurants are loaded from JSON
-          SampleDataSeeder.seedData(modelContext: sharedModelContainer.mainContext)
-          // Set model context for authentication manager
           userManager.setModelContext(sharedModelContainer.mainContext)
         }
     }
