@@ -269,6 +269,7 @@ struct ReviewRowView: View {
   NavigationStack {
     RestaurantDetailView(
       restaurant: RestaurantModel(
+        id: "123",
         name: "Sample Restaurant",
         description: "A great place to eat",
         latitude: 22.3193,

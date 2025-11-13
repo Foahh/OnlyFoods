@@ -11,7 +11,7 @@ import SwiftData
 @Model
 final class ReviewModel {
   @Attribute(.unique) var id: UUID
-  var restaurantID: UUID
+  var restaurantID: String
   var userID: UUID
   var rating: Int  // 1-5 stars
   var comment: String
@@ -20,7 +20,7 @@ final class ReviewModel {
 
   init(
     id: UUID = UUID(),
-    restaurantID: UUID,
+    restaurantID: String,
     userID: UUID,
     rating: Int,
     comment: String,
