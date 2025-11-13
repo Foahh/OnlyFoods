@@ -1,0 +1,20 @@
+{
+  "name": "openrice-crawler",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "fmt": "biome format --write"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.3.5",
+    "@types/bun": "^1.3.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "axios": "^1.13.2",
+    "axios-cookiejar-support": "^6.0.4",
+    "tough-cookie": "^6.0.0"
+  }
+}
