@@ -36,19 +36,10 @@
     },
     "businessHours": [
       {
-        "dayOfWeek": 0,
-        "periods": [
-          {
-            "open": "10:00",
-            "close": "22:00"
-          }
-        ]
-      },
-      {
         "dayOfWeek": 1,
         "periods": [
           {
-            "open": "11:00",
+            "open": "10:00",
             "close": "22:00"
           }
         ]
@@ -85,12 +76,21 @@
         "periods": [
           {
             "open": "11:00",
-            "close": "23:00"
+            "close": "22:00"
           }
         ]
       },
       {
         "dayOfWeek": 6,
+        "periods": [
+          {
+            "open": "11:00",
+            "close": "23:00"
+          }
+        ]
+      },
+      {
+        "dayOfWeek": 7,
         "periods": [
           {
             "open": "10:00",

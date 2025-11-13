@@ -52,27 +52,36 @@ struct TimeRange: Codable {
   }
 }
 
-struct BusinessHours: Codable {
-  var monday: [TimeRange]?
-  var tuesday: [TimeRange]?
-  var wednesday: [TimeRange]?
-  var thursday: [TimeRange]?
-  var friday: [TimeRange]?
-  var saturday: [TimeRange]?
-  var sunday: [TimeRange]?
+struct DayHours: Codable {
+  var dayOfWeek: Int  // 1 = Sunday, 2 = Monday, ..., 7 = Saturday
+  var periods: [TimeRange]
+}
 
-  /// Gets the time ranges for a specific weekday (1 = Sunday, 2 = Monday, ..., 7 = Saturday)
-  func hoursForWeekday(_ weekday: Int) -> [TimeRange]? {
-    switch weekday {
-    case 1: return sunday
-    case 2: return monday
-    case 3: return tuesday
-    case 4: return wednesday
-    case 5: return thursday
-    case 6: return friday
-    case 7: return saturday
-    default: return nil
+struct BusinessHours: Codable {
+  var days: [DayHours]
+  
+  // Custom Codable implementation to decode directly from array
+  init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    days = try container.decode([DayHours].self)
+  }
+  
+  func encode(to encoder: Encoder) throws {
+    var container = encoder.singleValueContainer()
+    try container.encode(days)
+  }
+  
+  init(days: [DayHours] = []) {
+    self.days = days
+  }
+
+  /// Gets the time ranges for a specific weekday
+  func hoursForWeekday(_ calendarWeekday: Int) -> [TimeRange]? {
+    guard calendarWeekday >= 1 && calendarWeekday <= 7 else {
+      return nil
     }
+    
+    return days.first { $0.dayOfWeek == calendarWeekday }?.periods
   }
 
   /// Checks if the restaurant is open at the current time
