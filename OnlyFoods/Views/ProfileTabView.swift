@@ -119,7 +119,7 @@ struct ProfileTabView: View {
               } else {
                 ForEach(userReviews) { review in
                   NavigationLink {
-                    if let restaurant = restaurantService.getRestaurant(by: review.restaurantID) {
+                    if let restaurant = restaurantService.getRestaurant(by: review.) {
                       RestaurantDetailView(restaurant: restaurant)
                     }
                   } label: {
