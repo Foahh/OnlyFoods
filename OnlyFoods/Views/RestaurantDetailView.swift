@@ -284,8 +284,16 @@ struct ReviewRowView: View {
 #Preview {
   let config = ModelConfiguration(isStoredInMemoryOnly: true)
   let container = try! ModelContainer(for: ReviewModel.self, UserModel.self, configurations: config)
-  let restaurantService = RestaurantService.shared
-  restaurantService.loadRestaurants()
-  return RestaurantDetailView(restaurant: restaurantService.restaurants[0])
-    .modelContainer(container)
+
+  return RestaurantDetailView(
+    restaurant: RestaurantModel(
+      id: "test-restaurant-id",
+      name: "Sample Restaurant",
+      description: "A great place",
+      latitude: 22.3193,
+      longitude: 114.1694,
+      categories: ["Italian"]
+    )
+  )
+  .modelContainer(container)
 }
