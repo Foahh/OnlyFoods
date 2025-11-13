@@ -41,12 +41,12 @@ class RestaurantService: ObservableObject {
     }
   }
 
-  func getRatingDetails(for restaurantID: UUID, from reviews: [ReviewModel]) -> RestaurantRating {
+  func getRatingDetails(for restaurantID: String, from reviews: [ReviewModel]) -> RestaurantRating {
     let restaurantReviews = reviews.filter { $0.restaurantID == restaurantID }
     return RestaurantRating.compute(from: restaurantReviews)
   }
 
-  func getRestaurant(by id: UUID) -> RestaurantModel? {
+  func getRestaurant(by id: String) -> RestaurantModel? {
     restaurants.first { $0.id == id }
   }
 }
