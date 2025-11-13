@@ -1,6 +1,6 @@
 [
   {
-    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "id": "idid-123454",
     "name": "Golden Dragon Restaurant",
     "description": "Authentic Cantonese cuisine with a modern twist. Known for our dim sum and roasted meats.",
     "latitude": 22.3193,
@@ -34,49 +34,70 @@
       "avg": 150,
       "max": 200
     },
-    "businessHours": {
-      "monday": [
-        {
-          "open": "11:00",
-          "close": "22:00"
-        }
-      ],
-      "tuesday": [
-        {
-          "open": "11:00",
-          "close": "22:00"
-        }
-      ],
-      "wednesday": [
-        {
-          "open": "11:00",
-          "close": "22:00"
-        }
-      ],
-      "thursday": [
-        {
-          "open": "11:00",
-          "close": "22:00"
-        }
-      ],
-      "friday": [
-        {
-          "open": "11:00",
-          "close": "23:00"
-        }
-      ],
-      "saturday": [
-        {
-          "open": "10:00",
-          "close": "23:00"
-        }
-      ],
-      "sunday": [
-        {
-          "open": "10:00",
-          "close": "22:00"
-        }
-      ]
-    }
+    "businessHours": [
+      {
+        "dayOfWeek": 0,
+        "periods": [
+          {
+            "open": "10:00",
+            "close": "22:00"
+          }
+        ]
+      },
+      {
+        "dayOfWeek": 1,
+        "periods": [
+          {
+            "open": "11:00",
+            "close": "22:00"
+          }
+        ]
+      },
+      {
+        "dayOfWeek": 2,
+        "periods": [
+          {
+            "open": "11:00",
+            "close": "22:00"
+          }
+        ]
+      },
+      {
+        "dayOfWeek": 3,
+        "periods": [
+          {
+            "open": "11:00",
+            "close": "22:00"
+          }
+        ]
+      },
+      {
+        "dayOfWeek": 4,
+        "periods": [
+          {
+            "open": "11:00",
+            "close": "22:00"
+          }
+        ]
+      },
+      {
+        "dayOfWeek": 5,
+        "periods": [
+          {
+            "open": "11:00",
+            "close": "23:00"
+          }
+        ]
+      },
+      {
+        "dayOfWeek": 6,
+        "periods": [
+          {
+            "open": "10:00",
+            "close": "23:00"
+          }
+        ]
+      }
+    ]
   }
 ]

@@ -8,7 +8,7 @@
 import Foundation
 
 struct RestaurantModel: Codable, Identifiable {
-  var id: UUID
+  var id: String
   var name: String
   var description: String
   var latitude: Double
@@ -23,7 +23,7 @@ struct RestaurantModel: Codable, Identifiable {
   var priceRange: PriceRange?
 
   init(
-    id: UUID = UUID(),
+    id: String,
     name: String,
     description: String,
     latitude: Double,
