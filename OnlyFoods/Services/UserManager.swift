@@ -22,7 +22,7 @@ class UserManager: ObservableObject {
     if !currentUserStore.isEmpty,
       let userID = UUID(uuidString: currentUserStore)
     {
-       print("Current user loaded from store: \(userID)")
+      print("Current user loaded from store: \(userID)")
     }
   }
 

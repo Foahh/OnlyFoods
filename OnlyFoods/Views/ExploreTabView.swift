@@ -134,7 +134,9 @@ struct RestaurantRowView: View {
         }
         .frame(width: 80, height: 80)
         .cornerRadius(8)
-      } else if let firstImage = restaurant.images.first, let firstImageURL = URL(string: firstImage) {
+      } else if let firstImage = restaurant.images.first,
+        let firstImageURL = URL(string: firstImage)
+      {
         AsyncImage(url: firstImageURL) { image in
           image
             .resizable()

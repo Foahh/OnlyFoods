@@ -43,7 +43,9 @@ struct RestaurantDetailView: View {
           ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
               // Show doorImage first if available
-              if let doorImage = currentRestaurant.doorImage, let doorImageURL = URL(string: doorImage) {
+              if let doorImage = currentRestaurant.doorImage,
+                let doorImageURL = URL(string: doorImage)
+              {
                 AsyncImage(url: doorImageURL) { image in
                   image
                     .resizable()
@@ -55,7 +57,7 @@ struct RestaurantDetailView: View {
                 .frame(width: 300, height: 200)
                 .cornerRadius(12)
               }
-              
+
               // Show other images
               ForEach(currentRestaurant.images, id: \.self) { imageURL in
                 if let url = URL(string: imageURL) {

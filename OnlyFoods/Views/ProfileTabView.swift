@@ -119,8 +119,12 @@ struct ProfileTabView: View {
               } else {
                 ForEach(userReviews) { review in
                   NavigationLink {
-                    if let restaurant = restaurantService.getRestaurant(by: review.) {
-                      RestaurantDetailView(restaurant: restaurant)
+                    Group {
+                      if let restaurant = restaurantService.getRestaurant(by: review.restaurantID) {
+                        RestaurantDetailView(restaurant: restaurant)
+                      } else {
+                        Text("Restaurant not found").navigationTitle("Error")
+                      }
                     }
                   } label: {
                     UserReviewRowView(review: review, restaurants: restaurantService.restaurants)
@@ -206,7 +210,9 @@ struct FavoriteRestaurantCard: View {
         }
         .frame(width: 150, height: 100)
         .cornerRadius(8)
-      } else if let firstImage = restaurant.images.first, let firstImageURL = URL(string: firstImage) {
+      } else if let firstImage = restaurant.images.first,
+        let firstImageURL = URL(string: firstImage)
+      {
         AsyncImage(url: firstImageURL) { image in
           image
             .resizable()

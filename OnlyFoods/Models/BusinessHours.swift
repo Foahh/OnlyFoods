@@ -1,4 +1,3 @@
-
 //
 //  RestaurantModel.swift
 //  OnlyFoods
@@ -61,18 +60,18 @@ struct DayHours: Codable {
 
 struct BusinessHours: Codable {
   var days: [DayHours]
-  
+
   // Custom Codable implementation to decode directly from array
   init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()
     days = try container.decode([DayHours].self)
   }
-  
+
   func encode(to encoder: Encoder) throws {
     var container = encoder.singleValueContainer()
     try container.encode(days)
   }
-  
+
   init(days: [DayHours] = []) {
     self.days = days
   }
@@ -82,7 +81,7 @@ struct BusinessHours: Codable {
     guard calendarWeekday >= 1 && calendarWeekday <= 7 else {
       return nil
     }
-    
+
     return days.first { $0.dayOfWeek == calendarWeekday }
   }
 
