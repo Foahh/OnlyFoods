@@ -10,16 +10,16 @@ import Foundation
 struct RestaurantRating {
   let averageRating: Double
   let reviewCount: Int
-  
+
   // Computes the average rating and review count from a list of reviews
   static func compute(from reviews: [ReviewModel]) -> RestaurantRating {
     guard !reviews.isEmpty else {
       return RestaurantRating(averageRating: 0.0, reviewCount: 0)
     }
-    
+
     let totalRating = reviews.reduce(0.0) { $0 + Double($1.rating) }
     let average = totalRating / Double(reviews.count)
-    
+
     return RestaurantRating(
       averageRating: average,
       reviewCount: reviews.count

@@ -1,6 +1,8 @@
 {
     "recommendations": [
         "sweetpad.sweetpad",
-        "sswg.swift-lang"
+        "sswg.swift-lang",
+        "biomejs.biome",
+        "oven.bun-vscode"
     ]
 }

@@ -5,16 +5,12 @@
 ## Prerequisites
 
 - [Bun](https://bun.sh) (JavaScript runtime)
-- Node.js (if not using Bun)
 
 ## Installation
 
 ```bash
 # Install dependencies
 bun install
-
-# if not using Bun
-npm install
 ```
 
 ## Project Structure
