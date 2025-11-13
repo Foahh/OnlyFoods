@@ -6,6 +6,7 @@
     "latitude": 22.3193,
     "longitude": 114.1694,
     "images": [],
+    "doorImage": "https://example.com/golden-dragon-door.jpg",
     "categories": [
       "Cantonese",
       "Dim Sum",
@@ -29,11 +30,7 @@
     ],
     "contactPhone": "+852 2123 4567",
     "addressString": "123 Central Street, Central, Hong Kong",
-    "priceRange": {
-      "min": 100,
-      "avg": 150,
-      "max": 200
-    },
+    "priceLevel": 2,
     "businessHours": [
       {
         "dayOfWeek": 1,

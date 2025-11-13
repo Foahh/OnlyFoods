@@ -14,13 +14,14 @@ struct RestaurantModel: Codable, Identifiable {
   var latitude: Double
   var longitude: Double
   var images: [String]  // URLs or asset names
+  var doorImage: String?  // Main door/entrance image
   var categories: [String]
   var services: [String]?
   var paymentMethods: [String]?
   var contactPhone: String?
   var addressString: String?
   var businessHours: BusinessHours?
-  var priceRange: PriceRange?
+  var priceLevel: Int?
 
   init(
     id: String,
@@ -29,13 +30,14 @@ struct RestaurantModel: Codable, Identifiable {
     latitude: Double,
     longitude: Double,
     images: [String] = [],
+    doorImage: String? = nil,
     categories: [String] = [],
     services: [String]? = nil,
     paymentMethods: [String]? = nil,
     contactPhone: String? = nil,
     addressString: String? = nil,
     businessHours: BusinessHours? = nil,
-    priceRange: PriceRange? = nil
+    priceLevel: Int? = nil
   ) {
     self.id = id
     self.name = name
@@ -43,13 +45,14 @@ struct RestaurantModel: Codable, Identifiable {
     self.latitude = latitude
     self.longitude = longitude
     self.images = images
+    self.doorImage = doorImage
     self.categories = categories
     self.services = services
     self.paymentMethods = paymentMethods
     self.contactPhone = contactPhone
     self.addressString = addressString
     self.businessHours = businessHours
-    self.priceRange = priceRange
+    self.priceLevel = priceLevel
   }
 
   /// Checks if the restaurant is currently open
