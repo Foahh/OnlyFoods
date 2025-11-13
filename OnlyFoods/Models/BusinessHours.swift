@@ -8,13 +8,13 @@
 import Foundation
 
 struct TimeRange: Codable {
-  var open: String
-  var close: String
+  var start: String
+  var end: String
 
   /// Checks if the given time (in "HH:mm" format) is within this time range
   func contains(time: String) -> Bool {
-    guard let openTime = parseTime(open),
-      let closeTime = parseTime(close),
+    guard let openTime = parseTime(start),
+      let closeTime = parseTime(end),
       let checkTime = parseTime(time)
     else {
       return false
