@@ -14,7 +14,6 @@ class RestaurantService: ObservableObject {
 
   static let shared = RestaurantService()
 
-  private let jsonLoader: JSONLoader = JSONLoader()
   private let dataSourceFiles = ["mock", "openrice"]
 
   init() {
@@ -31,19 +30,11 @@ class RestaurantService: ObservableObject {
   @MainActor
   private func performLoadRestaurants() async {
     var allRestaurants: [RestaurantModel] = []
-    var loadErrors: [String] = []
 
     for filename in dataSourceFiles {
-      let result = await jsonLoader.loadRestaurants(from: filename)
-
-      switch result {
-      case .success(let restaurants):
+      let result = await loadRestaurants(from: filename)
+      if let restaurants = result {
         allRestaurants.append(contentsOf: restaurants)
-        print("Loaded \(restaurants.count) restaurants from \(filename).json")
-      case .failure(let error):
-        let errorMessage = "Failed to load \(filename).json: \(error.localizedDescription)"
-        loadErrors.append(errorMessage)
-        print("Warning: \(errorMessage)")
       }
     }
 
@@ -54,14 +45,8 @@ class RestaurantService: ObservableObject {
       print("Merged \(duplicateCount) duplicate restaurant(s)")
     }
 
-    if !loadErrors.isEmpty && restaurants.isEmpty {
-      for error in loadErrors {
-        print("Error: \(error)")
-      }
-    }
-
     isLoading = false
-    print("Total unique restaurants loaded: \(restaurants.count)")
+    print("Total restaurants loaded: \(restaurants.count)")
   }
 
   private func deduplicateRestaurants(_ restaurants: [RestaurantModel]) -> ([RestaurantModel], Int)
@@ -112,46 +97,25 @@ class RestaurantService: ObservableObject {
   func getRestaurant(by id: String) -> RestaurantModel? {
     restaurants.first { $0.id == id }
   }
-}
 
-private struct JSONLoader {
-  private let decoder = JSONDecoder()
-  private let subdirectory = "Data/Restaurants"
-
-  func loadRestaurants(from filename: String) async -> Result<[RestaurantModel], Error> {
-    guard let url = findJSONFile(named: filename) else {
-      return .failure(JSONLoadError.fileNotFound(filename))
+  func loadRestaurants(from filename: String) async -> [RestaurantModel]? {
+    guard
+      let url = Bundle.main.url(
+        forResource: filename,
+        withExtension: "json",
+      )
+    else {
+      return nil
     }
 
     do {
-      let data = try await loadData(from: url)
+      let decoder = JSONDecoder()
+      let data = try Data(contentsOf: url)
       let restaurants = try decoder.decode([RestaurantModel].self, from: data)
-      return .success(restaurants)
+      return restaurants
     } catch {
-      return .failure(error)
-    }
-  }
-
-  private func findJSONFile(named filename: String) -> URL? {
-    Bundle.main.url(
-      forResource: filename,
-      withExtension: "json",
-      subdirectory: subdirectory
-    )
-  }
-
-  private func loadData(from url: URL) async throws -> Data {
-    try Data(contentsOf: url)
-  }
-}
-
-private enum JSONLoadError: Error {
-  case fileNotFound(String)
-
-  var errorDescription: String? {
-    switch self {
-    case .fileNotFound(let filename):
-      return "Could not find \(filename).json file"
+      print("Error loading restaurants from \(filename).json: \(error.localizedDescription)")
+      return nil
     }
   }
 }

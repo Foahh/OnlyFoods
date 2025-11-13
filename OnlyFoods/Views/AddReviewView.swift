@@ -87,7 +87,7 @@ struct AddReviewView: View {
 
   AddReviewView(
     restaurant: RestaurantModel(
-      id: "123",
+      id: "test-restaurant-id",
       name: "Sample Restaurant",
       description: "A great place",
       latitude: 22.3193,
