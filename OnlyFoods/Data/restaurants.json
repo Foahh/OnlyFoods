@@ -6,8 +6,8 @@
     "latitude": 22.3193,
     "longitude": 114.1694,
     "images": [],
-    "cuisineCategory": "Cantonese",
-    "tags": [
+    "categories": [
+      "Cantonese",
       "dimSum",
       "roastedMeats",
       "familyFriendly"

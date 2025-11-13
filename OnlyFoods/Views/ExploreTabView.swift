@@ -30,13 +30,12 @@ struct ExploreTabView: View {
     if !searchText.isEmpty {
       filtered = filtered.filter { restaurant in
         restaurant.name.localizedCaseInsensitiveContains(searchText)
-          || restaurant.cuisineCategory.localizedCaseInsensitiveContains(searchText)
-          || restaurant.tags.contains { $0.localizedCaseInsensitiveContains(searchText) }
+          || restaurant.categories.contains { $0.localizedCaseInsensitiveContains(searchText) }
       }
     }
 
     if let category = selectedCategory {
-      filtered = filtered.filter { $0.cuisineCategory == category }
+      filtered = filtered.filter { $0.categories.contains(category) }
     }
 
     return filtered
@@ -150,9 +149,11 @@ struct RestaurantRowView: View {
         Text(restaurant.name)
           .font(.headline)
 
-        Text(restaurant.cuisineCategory)
-          .font(.subheadline)
-          .foregroundColor(.secondary)
+        if !restaurant.categories.isEmpty {
+          Text(restaurant.categories.prefix(2).joined(separator: " | "))
+            .font(.subheadline)
+            .foregroundColor(.secondary)
+        }
 
         HStack(spacing: 4) {
           Image(systemName: "star.fill")
@@ -163,22 +164,6 @@ struct RestaurantRowView: View {
           Text("(\(rating.reviewCount))")
             .font(.caption)
             .foregroundColor(.secondary)
-        }
-
-        if !restaurant.tags.isEmpty {
-          ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 6) {
-              ForEach(restaurant.tags.prefix(3), id: \.self) { tag in
-                Text(tag)
-                  .font(.caption2)
-                  .padding(.horizontal, 8)
-                  .padding(.vertical, 4)
-                  .background(Color.blue.opacity(0.1))
-                  .foregroundColor(.blue)
-                  .cornerRadius(8)
-              }
-            }
-          }
         }
       }
 

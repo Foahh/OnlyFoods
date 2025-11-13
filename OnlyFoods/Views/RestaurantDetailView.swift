@@ -98,16 +98,12 @@ struct RestaurantDetailView: View {
             }
           }
 
-          // Category and Tags
-          Text(currentRestaurant.cuisineCategory)
-            .font(.headline)
-            .foregroundColor(.blue)
-
-          if !currentRestaurant.tags.isEmpty {
+          // Categories
+          if !currentRestaurant.categories.isEmpty {
             ScrollView(.horizontal, showsIndicators: false) {
               HStack(spacing: 8) {
-                ForEach(currentRestaurant.tags, id: \.self) { tag in
-                  Text(tag)
+                ForEach(currentRestaurant.categories, id: \.self) { category in
+                  Text(category)
                     .font(.subheadline)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
@@ -277,7 +273,7 @@ struct ReviewRowView: View {
         description: "A great place to eat",
         latitude: 22.3193,
         longitude: 114.1694,
-        cuisineCategory: "Italian"
+        categories: ["Italian"]
       ))
   }
   .modelContainer(container)
