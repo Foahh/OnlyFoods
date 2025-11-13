@@ -8,27 +8,32 @@
     "images": [],
     "categories": [
       "Cantonese",
-      "dimSum",
-      "roastedMeats",
-      "familyFriendly"
+      "Dim Sum",
+      "roasted meats",
+      "family friendly"
     ],
     "services": [
       "wifi",
       "parking",
-      "airConditioning",
-      "wheelchairAccessible",
-      "privateDiningRoom",
+      "air conditioning",
+      "wheelchair accessible",
+      "private dining room",
       "takeout"
     ],
     "paymentMethods": [
       "cash",
-      "creditCard",
-      "debitCard",
+      "credit card",
+      "debit card",
       "alipay",
-      "weChatPay"
+      "we chat pay"
     ],
     "contactPhone": "+852 2123 4567",
     "addressString": "123 Central Street, Central, Hong Kong",
+    "priceRange": {
+      "min": 100,
+      "avg": 150,
+      "max": 200
+    },
     "businessHours": {
       "monday": [
         {

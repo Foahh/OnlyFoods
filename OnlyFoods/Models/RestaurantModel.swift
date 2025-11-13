@@ -20,6 +20,7 @@ struct RestaurantModel: Codable, Identifiable {
   var contactPhone: String?
   var addressString: String?
   var businessHours: BusinessHours?
+  var priceRange: PriceRange?
 
   init(
     id: UUID = UUID(),
@@ -33,7 +34,8 @@ struct RestaurantModel: Codable, Identifiable {
     paymentMethods: [String]? = nil,
     contactPhone: String? = nil,
     addressString: String? = nil,
-    businessHours: BusinessHours? = nil
+    businessHours: BusinessHours? = nil,
+    priceRange: PriceRange? = nil
   ) {
     self.id = id
     self.name = name
@@ -47,6 +49,7 @@ struct RestaurantModel: Codable, Identifiable {
     self.contactPhone = contactPhone
     self.addressString = addressString
     self.businessHours = businessHours
+    self.priceRange = priceRange
   }
 
   /// Checks if the restaurant is currently open
