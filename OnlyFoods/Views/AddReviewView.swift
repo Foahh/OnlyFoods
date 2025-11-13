@@ -91,7 +91,7 @@ struct AddReviewView: View {
       description: "A great place",
       latitude: 22.3193,
       longitude: 114.1694,
-      cuisineCategory: "Italian",
+      categories: ["Italian"]
     ),
     user: UserModel(username: "TestUser")
   )

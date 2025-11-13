@@ -15,7 +15,7 @@ struct SearchView: View {
   let restaurants: [RestaurantModel]
 
   var categories: [String] {
-    Array(Set(restaurants.map { $0.cuisineCategory })).sorted()
+    Array(Set(restaurants.flatMap { $0.categories })).sorted()
   }
 
   var body: some View {
