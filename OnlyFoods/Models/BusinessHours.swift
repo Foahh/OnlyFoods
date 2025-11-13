@@ -54,6 +54,8 @@ struct TimeRange: Codable {
 
 struct DayHours: Codable {
   var dayOfWeek: Int  // 1 = Sunday, 2 = Monday, ..., 7 = Saturday
+  var isClosed: Bool
+  var is24hr: Bool
   var periods: [TimeRange]
 }
 
@@ -75,13 +77,18 @@ struct BusinessHours: Codable {
     self.days = days
   }
 
-  /// Gets the time ranges for a specific weekday
-  func hoursForWeekday(_ calendarWeekday: Int) -> [TimeRange]? {
+  /// Gets the day hours for a specific weekday
+  func dayHoursForWeekday(_ calendarWeekday: Int) -> DayHours? {
     guard calendarWeekday >= 1 && calendarWeekday <= 7 else {
       return nil
     }
     
-    return days.first { $0.dayOfWeek == calendarWeekday }?.periods
+    return days.first { $0.dayOfWeek == calendarWeekday }
+  }
+
+  /// Gets the time ranges for a specific weekday
+  func hoursForWeekday(_ calendarWeekday: Int) -> [TimeRange]? {
+    return dayHoursForWeekday(calendarWeekday)?.periods
   }
 
   /// Checks if the restaurant is open at the current time
@@ -89,12 +96,22 @@ struct BusinessHours: Codable {
     let calendar = Calendar.current
     let weekday = calendar.component(.weekday, from: Date())
 
-    guard let timeRanges = hoursForWeekday(weekday) else {
+    guard let dayHours = dayHoursForWeekday(weekday) else {
       return false
     }
 
-    // Check if current time falls within any of the time ranges for today
-    return timeRanges.contains { $0.containsCurrentTime() }
+    // If the day is marked as closed, return false
+    if dayHours.isClosed {
+      return false
+    }
+
+    // If the day is 24 hours, return true
+    if dayHours.is24hr {
+      return true
+    }
+
+    // Otherwise, check if current time falls within any of the time ranges for today
+    return dayHours.periods.contains { $0.containsCurrentTime() }
   }
 
   /// Checks if the restaurant is open at a specific date
@@ -102,8 +119,18 @@ struct BusinessHours: Codable {
     let calendar = Calendar.current
     let weekday = calendar.component(.weekday, from: date)
 
-    guard let timeRanges = hoursForWeekday(weekday) else {
+    guard let dayHours = dayHoursForWeekday(weekday) else {
       return false
+    }
+
+    // If the day is marked as closed, return false
+    if dayHours.isClosed {
+      return false
+    }
+
+    // If the day is 24 hours, return true
+    if dayHours.is24hr {
+      return true
     }
 
     let formatter = DateFormatter()
@@ -111,6 +138,6 @@ struct BusinessHours: Codable {
     let timeString = formatter.string(from: date)
 
     // Check if the given time falls within any of the time ranges for that day
-    return timeRanges.contains { $0.contains(time: timeString) }
+    return dayHours.periods.contains { $0.contains(time: timeString) }
   }
 }
