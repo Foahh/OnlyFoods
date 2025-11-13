@@ -16,15 +16,21 @@ struct MainTabView: View {
     TabView(selection: $selectedTab) {
       ExploreTabView()
         .tabItem {
-          Label("Explore", systemImage: "map")
+          Label("Explore", systemImage: "list.bullet")
         }
         .tag(0)
+
+      MapTabView()
+        .tabItem {
+          Label("Map", systemImage: "map")
+        }
+        .tag(1)
 
       ProfileTabView()
         .tabItem {
           Label("Profile", systemImage: "person.circle")
         }
-        .tag(1)
+        .tag(2)
     }
   }
 }
