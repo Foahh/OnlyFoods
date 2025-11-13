@@ -74,7 +74,6 @@ class RestaurantService: ObservableObject {
     return RestaurantModel(
       id: first.id,
       name: second.name.isEmpty ? first.name : second.name,
-      description: second.description.isEmpty ? first.description : second.description,
       latitude: second.latitude != 0 ? second.latitude : first.latitude,
       longitude: second.longitude != 0 ? second.longitude : first.longitude,
       images: second.images.isEmpty ? first.images : second.images,

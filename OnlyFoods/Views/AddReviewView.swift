@@ -89,7 +89,6 @@ struct AddReviewView: View {
     restaurant: RestaurantModel(
       id: "test-restaurant-id",
       name: "Sample Restaurant",
-      description: "A great place",
       latitude: 22.3193,
       longitude: 114.1694,
       categories: ["Italian"]

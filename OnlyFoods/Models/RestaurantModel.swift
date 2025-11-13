@@ -10,7 +10,6 @@ import Foundation
 struct RestaurantModel: Codable, Identifiable {
   var id: String
   var name: String
-  var description: String
   var latitude: Double
   var longitude: Double
   var images: [String]  // URLs or asset names
@@ -26,7 +25,6 @@ struct RestaurantModel: Codable, Identifiable {
   init(
     id: String,
     name: String,
-    description: String,
     latitude: Double,
     longitude: Double,
     images: [String] = [],
@@ -41,7 +39,6 @@ struct RestaurantModel: Codable, Identifiable {
   ) {
     self.id = id
     self.name = name
-    self.description = description
     self.latitude = latitude
     self.longitude = longitude
     self.images = images

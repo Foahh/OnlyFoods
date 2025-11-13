@@ -112,7 +112,6 @@ interface StateFile {
 interface TransformedPoi {
   id: string;
   name: string;
-  description: string;
   latitude: number;
   longitude: number;
   images: string[];
@@ -403,7 +402,6 @@ async function transformPois(): Promise<void> {
         const transformed: TransformedPoi = {
           id,
           name: poi.name,
-          description: poi.info || "",
           latitude: poi.mapLatitude,
           longitude: poi.mapLongitude,
           images,

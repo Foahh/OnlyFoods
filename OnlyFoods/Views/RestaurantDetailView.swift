@@ -136,15 +136,6 @@ struct RestaurantDetailView: View {
 
           Divider()
 
-          // Description
-          Text("About")
-            .font(.headline)
-          Text(currentRestaurant.description)
-            .font(.body)
-            .foregroundColor(.secondary)
-
-          Divider()
-
           // Location Map
           Text("Location")
             .font(.headline)
@@ -289,7 +280,6 @@ struct ReviewRowView: View {
     restaurant: RestaurantModel(
       id: "test-restaurant-id",
       name: "Sample Restaurant",
-      description: "A great place",
       latitude: 22.3193,
       longitude: 114.1694,
       categories: ["Italian"]
