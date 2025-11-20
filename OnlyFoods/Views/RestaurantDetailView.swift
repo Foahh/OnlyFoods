@@ -85,16 +85,18 @@ struct RestaurantDetailView: View {
               Text(currentRestaurant.name)
                 .font(.largeTitle)
                 .fontWeight(.bold)
-
-              HStack(spacing: 4) {
-                Image(systemName: "star.fill")
-                  .foregroundColor(.yellow)
-                Text(String(format: "%.1f", rating.averageRating))
-                  .font(.title3)
-                Text("(\(rating.reviewCount) reviews)")
-                  .font(.subheadline)
-                  .foregroundColor(.secondary)
-              }
+				
+				if rating.averageRating >= 1.0 {
+					HStack(spacing: 4) {
+						Image(systemName: "star.fill")
+							.foregroundColor(.yellow)
+						Text(String(format: "%.1f", rating.averageRating))
+							.font(.title3)
+						Text("(\(rating.reviewCount) reviews)")
+							.font(.subheadline)
+							.foregroundColor(.secondary)
+					}
+				}
             }
 
             Spacer()
