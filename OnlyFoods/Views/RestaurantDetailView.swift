@@ -8,6 +8,7 @@
 import MapKit
 import SwiftData
 import SwiftUI
+import UIKit
 
 struct RestaurantDetailView: View {
   @Environment(\.modelContext) private var modelContext
@@ -65,17 +66,6 @@ struct RestaurantDetailView: View {
     RestaurantService.shared.getVisitedCount(for: currentRestaurant.id, from: users)
   }
 
-  private func mapURL(for address: String) -> URL? {
-    guard let encoded = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
-    else {
-      return nil
-    }
-    return URL(
-      string:
-        "http://maps.apple.com/?q=\(encoded)&ll=\(currentRestaurant.latitude),\(currentRestaurant.longitude)"
-    )
-  }
-
   private func phoneURL(for phone: String) -> URL? {
     let sanitized = phone.filter { "0123456789+".contains($0) }
     guard !sanitized.isEmpty else { return nil }
@@ -124,7 +114,6 @@ struct RestaurantDetailView: View {
             longitude: currentRestaurant.longitude,
             restaurantName: currentRestaurant.name,
             address: currentRestaurant.addressString,
-            mapURL: currentRestaurant.addressString.flatMap { mapURL(for: $0) },
             phone: currentRestaurant.contactPhone,
             phoneURL: currentRestaurant.contactPhone.flatMap { phoneURL(for: $0) }
           )
@@ -188,8 +177,6 @@ extension RestaurantDetailView {
     }
   }
 }
-
-// MARK: - Sections
 
 struct RestaurantDetailHeaderSection: View {
   let restaurantName: String
@@ -381,7 +368,6 @@ struct RestaurantDetailLocationContactSection: View {
   let longitude: Double
   let restaurantName: String
   let address: String?
-  let mapURL: URL?
   let phone: String?
   let phoneURL: URL?
 
@@ -621,25 +607,8 @@ struct ReviewRowView: View {
       if !review.images.isEmpty {
         ScrollView(.horizontal, showsIndicators: false) {
           HStack(spacing: 8) {
-            ForEach(review.images, id: \.self) { imageURL in
-              if let url = URL(string: imageURL) {
-                AsyncImage(url: url) { phase in
-                  switch phase {
-                  case .empty:
-                    ReviewImagePlaceholder()
-                  case .success(let image):
-                    image
-                      .resizable()
-                      .aspectRatio(contentMode: .fill)
-                  case .failure:
-                    ReviewImagePlaceholder()
-                  @unknown default:
-                    ReviewImagePlaceholder()
-                  }
-                }
-                .frame(width: 100, height: 100)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-              }
+            ForEach(review.images, id: \.self) { imageSource in
+              ReviewImageView(imageSource: imageSource)
             }
           }
         }
@@ -825,9 +794,17 @@ struct DayHoursRow: View {
   let dayHours: DayHours?
 
   private enum BusinessHourDisplayFormatter {
-    static let inputFormatter: DateFormatter = {
+    static let inputFormatterMinutes: DateFormatter = {
       let formatter = DateFormatter()
       formatter.dateFormat = "HH:mm"
+      formatter.locale = Locale(identifier: "en_US_POSIX")
+      formatter.timeZone = TimeZone(secondsFromGMT: 0)
+      return formatter
+    }()
+
+    static let inputFormatterSeconds: DateFormatter = {
+      let formatter = DateFormatter()
+      formatter.dateFormat = "HH:mm:ss"
       formatter.locale = Locale(identifier: "en_US_POSIX")
       formatter.timeZone = TimeZone(secondsFromGMT: 0)
       return formatter
@@ -842,11 +819,24 @@ struct DayHoursRow: View {
       return formatter
     }()
 
-    static func formattedTime(_ rawValue: String) -> String {
-      guard let date = inputFormatter.date(from: rawValue) else {
-        return rawValue
+    private static func parsedDate(from rawValue: String) -> Date? {
+      if let date = inputFormatterMinutes.date(from: rawValue) {
+        return date
       }
-      return outputFormatter.string(from: date)
+      return inputFormatterSeconds.date(from: rawValue)
+    }
+
+    private static func trimmedRawTime(_ rawValue: String) -> String {
+      let components = rawValue.split(separator: ":")
+      guard components.count >= 2 else { return rawValue }
+      return components[0...1].joined(separator: ":")
+    }
+
+    static func formattedTime(_ rawValue: String) -> String {
+      if let date = parsedDate(from: rawValue) {
+        return outputFormatter.string(from: date)
+      }
+      return trimmedRawTime(rawValue)
     }
 
     static func formattedRange(_ range: TimeRange) -> String {
@@ -955,6 +945,7 @@ struct RestaurantDetailImageView: View {
 
 struct RestaurantImageItem: View {
   let url: URL
+  @State private var isPresentingFullScreen = false
 
   var body: some View {
     AsyncImage(url: url) { phase in
@@ -973,6 +964,16 @@ struct RestaurantImageItem: View {
     }
     .frame(width: 200, height: 150)
     .clipShape(RoundedRectangle(cornerRadius: 12))
+    .contentShape(RoundedRectangle(cornerRadius: 12))
+    .onTapGesture {
+      isPresentingFullScreen = true
+    }
+    .fullScreenCover(isPresented: $isPresentingFullScreen) {
+      FullScreenImageView(imageSource: url.absoluteString) {
+        ImagePlaceholder()
+          .frame(width: 200, height: 200)
+      }
+    }
   }
 }
 
@@ -985,6 +986,72 @@ struct AvatarPlaceholder: View {
           .font(.system(size: 20))
           .foregroundStyle(.secondary.opacity(0.6))
       }
+  }
+}
+
+struct ReviewImageView: View {
+  let imageSource: String
+  @State private var isPresentingFullScreen = false
+
+  var body: some View {
+    content
+      .frame(width: 100, height: 100)
+      .clipShape(RoundedRectangle(cornerRadius: 8))
+      .contentShape(RoundedRectangle(cornerRadius: 8))
+      .onTapGesture {
+        isPresentingFullScreen = true
+      }
+      .fullScreenCover(isPresented: $isPresentingFullScreen) {
+        FullScreenImageView(imageSource: imageSource) {
+          ReviewImagePlaceholder()
+            .frame(width: 200, height: 200)
+        }
+      }
+  }
+
+  @ViewBuilder
+  private var content: some View {
+    if let remoteURL = remoteURL {
+      AsyncImage(url: remoteURL) { phase in
+        switch phase {
+        case .empty:
+          ReviewImagePlaceholder()
+        case .success(let image):
+          image
+            .resizable()
+            .aspectRatio(contentMode: .fill)
+        case .failure:
+          ReviewImagePlaceholder()
+        @unknown default:
+          ReviewImagePlaceholder()
+        }
+      }
+    } else if let decodedImage = decodedUIImage {
+      Image(uiImage: decodedImage)
+        .resizable()
+        .aspectRatio(contentMode: .fill)
+    } else {
+      ReviewImagePlaceholder()
+    }
+  }
+
+  private var remoteURL: URL? {
+    guard let url = URL(string: imageSource), url.scheme != nil else {
+      return nil
+    }
+    return url
+  }
+
+  private var decodedUIImage: UIImage? {
+    guard let data = Data(base64Encoded: normalizedBase64) else { return nil }
+    return UIImage(data: data)
+  }
+
+  private var normalizedBase64: String {
+    guard let range = imageSource.range(of: "base64,") else {
+      return imageSource
+    }
+    return String(imageSource[range.upperBound...])
   }
 }
 
