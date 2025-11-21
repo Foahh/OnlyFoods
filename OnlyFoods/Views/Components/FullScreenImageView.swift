@@ -1,3 +1,10 @@
+//
+//  FullScreenImageView.swift
+//  OnlyFoods
+//
+//  Created by Foahh on 2025/11/21.
+//
+
 import SwiftUI
 
 struct FullScreenImageView<Placeholder: View>: View {
