@@ -8,37 +8,49 @@
 import SwiftData
 import SwiftUI
 
-struct MainTabView: View {
-  @Environment(\.modelContext) private var modelContext
-  @State private var selectedTab = 0
-
-  var body: some View {
-    TabView(selection: $selectedTab) {
-      ExploreTabView()
-        .tabItem {
-          Label("Explore", systemImage: "list.bullet")
-        }
-        .tag(0)
-
-      MapTabView()
-        .tabItem {
-          Label("Map", systemImage: "map")
-        }
-        .tag(1)
-
-      ProfileTabView()
-        .tabItem {
-          Label("Profile", systemImage: "person.circle")
-        }
-        .tag(2)
+struct TabBarMinimizeModifier: ViewModifier {
+  func body(content: Content) -> some View {
+    if #available(iOS 26.0, *) {
+      content.tabBarMinimizeBehavior(.onScrollDown)
+    } else {
+      content
     }
   }
 }
 
-#Preview {
-  let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(for: ReviewModel.self, UserModel.self, configurations: config)
+struct MainTabView: View {
+  @Environment(\.modelContext) private var modelContext
+  @StateObject private var searchService = SearchService.shared
+  @State private var selectedTab = 0
 
-  return MainTabView()
-    .modelContainer(container)
+  var body: some View {
+    TabView(selection: $selectedTab) {
+
+      Tab("Explore", systemImage: "list.bullet", value: 0) {
+        ExploreTabView()
+
+      }
+
+      Tab("Map", systemImage: "map", value: 1) {
+        MapTabView()
+
+      }
+
+      Tab("Profile", systemImage: "person.circle", value: 2) {
+        ProfileTabView()
+
+      }
+
+      Tab(value: 3, role: .search) {
+        SearchView()
+      }
+
+    }
+    .modifier(TabBarMinimizeModifier())
+  }
+}
+
+#Preview {
+  MainTabView()
+    .previewContainerWithUserManager()
 }

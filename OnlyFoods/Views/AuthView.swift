@@ -15,7 +15,6 @@ struct AuthView: View {
   @Query private var users: [UserModel]
 
   @State private var username: String = ""
-  @State private var isCreatingAccount = false
   @State private var errorMessage: String?
 
   var body: some View {
@@ -45,13 +44,9 @@ struct AuthView: View {
           }
 
           Button {
-            if isCreatingAccount {
-              createAccount()
-            } else {
-              login()
-            }
+            authenticate()
           } label: {
-            Text(isCreatingAccount ? "Create Account" : "Login")
+            Text("Continue")
               .font(.headline)
               .foregroundColor(.white)
               .frame(maxWidth: .infinity)
@@ -60,25 +55,13 @@ struct AuthView: View {
               .cornerRadius(10)
           }
           .disabled(username.isEmpty)
-
-          Button {
-            isCreatingAccount.toggle()
-            errorMessage = nil
-          } label: {
-            Text(
-              isCreatingAccount
-                ? "Already have an account? Login" : "Don't have an account? Sign up"
-            )
-            .font(.subheadline)
-            .foregroundColor(.blue)
-          }
         }
         .padding(.horizontal, 32)
 
         Spacer()
       }
       .padding()
-      .navigationTitle(isCreatingAccount ? "Sign Up" : "Login")
+      .navigationTitle("Welcome")
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
@@ -90,37 +73,29 @@ struct AuthView: View {
     }
   }
 
-  private func login() {
-    if let user = users.first(where: { $0.username.lowercased() == username.lowercased() }) {
-      userManager.setCurrentUser(user)
+  private func authenticate() {
+    let normalizedUsername = username.lowercased()
+
+    // Check if user already exists
+    if let existingUser = users.first(where: { $0.username.lowercased() == normalizedUsername }) {
+      // User exists, log them in
+      userManager.setCurrentUser(existingUser)
       errorMessage = nil
       dismiss()
-      print("Login successful for user: \(user.username)")
+      print("Login successful for user: \(existingUser.username)")
     } else {
-      errorMessage = "User not found. Please create an account."
+      // User doesn't exist, create new account
+      let newUser = UserModel(username: username)
+      modelContext.insert(newUser)
+      userManager.setCurrentUser(newUser)
+      errorMessage = nil
+      dismiss()
+      print("Account created and logged in for user: \(newUser.username)")
     }
-  }
-
-  private func createAccount() {
-    if users.contains(where: { $0.username.lowercased() == username.lowercased() }) {
-      errorMessage = "Username already taken"
-      return
-    }
-
-    let newUser = UserModel(username: username)
-    modelContext.insert(newUser)
-    userManager.setCurrentUser(newUser)
-    errorMessage = nil
-    dismiss()
   }
 }
 
 #Preview {
-  let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(for: UserModel.self, configurations: config)
-  let userManager = UserManager()
-
   AuthView()
-    .modelContainer(container)
-    .environmentObject(userManager)
+    .previewContainerWithUserManager()
 }

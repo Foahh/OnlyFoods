@@ -208,9 +208,6 @@ struct AddReviewView: View {
 }
 
 #Preview {
-  let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(for: ReviewModel.self, UserModel.self, configurations: config)
-
   AddReviewView(
     restaurant: RestaurantModel(
       id: "test-restaurant-id",
@@ -219,7 +216,7 @@ struct AddReviewView: View {
       longitude: 114.1694,
       categories: ["Italian"]
     ),
-    user: UserModel(username: "TestUser")
+    user: PreviewHelpers.createMockUser(username: "TestUser")
   )
-  .modelContainer(container)
+  .previewContainer()
 }

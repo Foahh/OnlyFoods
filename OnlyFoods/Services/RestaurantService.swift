@@ -7,6 +7,7 @@
 
 import Combine
 import Foundation
+import SwiftData
 
 class RestaurantService: ObservableObject {
   @Published var restaurants: [RestaurantModel] = []
@@ -95,6 +96,16 @@ class RestaurantService: ObservableObject {
 
   func getRestaurant(by id: String) -> RestaurantModel? {
     restaurants.first { $0.id == id }
+  }
+
+  /// Get the count of users who have favorited a restaurant
+  func getFavoriteCount(for restaurantID: String, from users: [UserModel]) -> Int {
+    users.filter { $0.isFavorite(restaurantID: restaurantID) }.count
+  }
+
+  /// Get the count of users who have visited a restaurant
+  func getVisitedCount(for restaurantID: String, from users: [UserModel]) -> Int {
+    users.filter { $0.isVisited(restaurantID: restaurantID) }.count
   }
 
   func loadRestaurants(from filename: String) async -> [RestaurantModel]? {
