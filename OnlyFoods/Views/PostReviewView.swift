@@ -154,10 +154,7 @@ private struct ReviewPhotoCarousel: View {
               .scaledToFill()
               .frame(width: 120, height: 120)
               .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-              .overlay(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                  .stroke(Color.white.opacity(0.8), lineWidth: 1)
-              )
+
               .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
               .clipped()
 
