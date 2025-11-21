@@ -26,46 +26,47 @@ struct VisitedRestaurantsView: View {
   var body: some View {
     ScrollView {
       if visitedRestaurants.isEmpty {
-        VStack(spacing: 20) {
-          Spacer()
-            .frame(height: 100)
-
-          Image(systemName: "checkmark.circle")
-            .font(.system(size: 60))
-            .foregroundStyle(.secondary.opacity(0.5))
-
-          Text("No visited restaurants yet")
-            .font(.title3)
-            .fontWeight(.semibold)
-            .foregroundStyle(.primary)
-
-          Text("Mark restaurants as visited to keep track of your dining experiences")
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
-            .multilineTextAlignment(.center)
-            .padding(.horizontal, 32)
-
-          Spacer()
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        VisitedRestaurantsEmptyState()
       } else {
-        LazyVStack(spacing: 16) {
-          ForEach(visitedRestaurants) { restaurant in
-            NavigationLink {
-              RestaurantDetailView(restaurant: restaurant)
-            } label: {
-              VisitedRestaurantRow(restaurant: restaurant, reviews: reviews)
-            }
-            .buttonStyle(.plain)
-          }
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
+        VisitedRestaurantsList(
+          restaurants: visitedRestaurants,
+          reviews: reviews
+        )
       }
     }
     .navigationTitle("Visited Restaurants")
     .navigationBarTitleDisplayMode(.large)
     .background(Color(.systemGroupedBackground))
+  }
+}
+
+struct VisitedRestaurantsEmptyState: View {
+  var body: some View {
+    EmptyStateView(
+      icon: "checkmark.circle",
+      title: "No visited restaurants yet",
+      message: "Mark restaurants as visited to keep track of your dining experiences"
+    )
+  }
+}
+
+struct VisitedRestaurantsList: View {
+  let restaurants: [RestaurantModel]
+  let reviews: [ReviewModel]
+
+  var body: some View {
+    LazyVStack(spacing: 16) {
+      ForEach(restaurants) { restaurant in
+        NavigationLink {
+          RestaurantDetailView(restaurant: restaurant)
+        } label: {
+          VisitedRestaurantRow(restaurant: restaurant, reviews: reviews)
+        }
+        .buttonStyle(.plain)
+      }
+    }
+    .padding(.horizontal, 16)
+    .padding(.vertical, 8)
   }
 }
 
@@ -79,113 +80,10 @@ struct VisitedRestaurantRow: View {
 
   var body: some View {
     HStack(spacing: 16) {
-      // Restaurant Image
-      Group {
-        if let doorImage = restaurant.doorImage, let doorImageURL = URL(string: doorImage) {
-          AsyncImage(url: doorImageURL) { phase in
-            switch phase {
-            case .empty:
-              Rectangle()
-                .fill(Color.gray.opacity(0.2))
-                .overlay {
-                  ProgressView()
-                }
-            case .success(let image):
-              image
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-            case .failure:
-              Rectangle()
-                .fill(Color.gray.opacity(0.2))
-                .overlay {
-                  Image(systemName: "photo")
-                    .foregroundStyle(.secondary.opacity(0.5))
-                }
-            @unknown default:
-              Rectangle()
-                .fill(Color.gray.opacity(0.2))
-            }
-          }
-        } else if let firstImage = restaurant.images.first,
-          let firstImageURL = URL(string: firstImage)
-        {
-          AsyncImage(url: firstImageURL) { phase in
-            switch phase {
-            case .empty:
-              Rectangle()
-                .fill(Color.gray.opacity(0.2))
-                .overlay {
-                  ProgressView()
-                }
-            case .success(let image):
-              image
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-            case .failure:
-              Rectangle()
-                .fill(Color.gray.opacity(0.2))
-                .overlay {
-                  Image(systemName: "photo")
-                    .foregroundStyle(.secondary.opacity(0.5))
-                }
-            @unknown default:
-              Rectangle()
-                .fill(Color.gray.opacity(0.2))
-            }
-          }
-        } else {
-          Rectangle()
-            .fill(Color.gray.opacity(0.2))
-            .overlay {
-              Image(systemName: "photo")
-                .foregroundStyle(.secondary.opacity(0.5))
-            }
-        }
-      }
-      .frame(width: 100, height: 100)
-      .clipShape(RoundedRectangle(cornerRadius: 12))
-      .overlay(
-        RoundedRectangle(cornerRadius: 12)
-          .stroke(Color(.separator), lineWidth: 0.5)
-      )
+      RestaurantThumbnailView(restaurant: restaurant)
 
-      // Restaurant Info
-      VStack(alignment: .leading, spacing: 8) {
-        Text(restaurant.name)
-          .font(.headline)
-          .fontWeight(.semibold)
-          .foregroundStyle(.primary)
-          .lineLimit(2)
+      RestaurantInfoView(restaurant: restaurant, rating: rating)
 
-        if rating.reviewCount > 0 {
-          HStack(spacing: 4) {
-            Image(systemName: "star.fill")
-              .foregroundStyle(.yellow)
-              .font(.caption)
-            Text(String(format: "%.1f", rating.averageRating))
-              .font(.subheadline)
-              .fontWeight(.medium)
-              .foregroundStyle(.secondary)
-            Text("(\(rating.reviewCount))")
-              .font(.caption)
-              .foregroundStyle(.secondary.opacity(0.7))
-          }
-        } else {
-          Text("No ratings yet")
-            .font(.caption)
-            .foregroundStyle(.secondary.opacity(0.7))
-        }
-
-        if !restaurant.categories.isEmpty {
-          Text(restaurant.categories.prefix(2).joined(separator: ", "))
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .lineLimit(1)
-        }
-      }
-      .frame(maxWidth: .infinity, alignment: .leading)
-
-      // Chevron
       Image(systemName: "chevron.right")
         .font(.caption)
         .foregroundStyle(.secondary.opacity(0.5))

@@ -25,24 +25,20 @@ struct ContentView: View {
 
   var body: some View {
     TabView(selection: $selectedTab) {
-
       Tab("Explore", systemImage: "list.bullet", value: 0) {
         ExploreTabView()
       }
 
       Tab("Map", systemImage: "map", value: 1) {
         MapTabView()
-
       }
 
       Tab("Profile", systemImage: "person.circle", value: 2) {
         ProfileTabView()
       }
 
-      if selectedTab == 0 || selectedTab == 1 {
-        Tab(value: 3, role: .search) {
-          SearchView()
-        }
+      Tab(value: 3, role: .search) {
+        SearchView()
       }
     }
     .modifier(TabBarMinimizeModifier())
