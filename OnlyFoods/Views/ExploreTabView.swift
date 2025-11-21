@@ -42,7 +42,7 @@ struct ExploreTabView: View {
           ProgressView()
             .scaleEffect(1.5)
         } else if filteredRestaurants.isEmpty {
-          EmptyStateView(
+          ExploreEmptyStateView(
             hasActiveFilters: !searchService.searchText.isEmpty
               || searchService.selectedCategory != nil
           )
@@ -72,7 +72,7 @@ struct ExploreTabView: View {
   }
 }
 
-struct EmptyStateView: View {
+struct ExploreEmptyStateView: View {
   let hasActiveFilters: Bool
 
   var body: some View {
@@ -214,25 +214,8 @@ struct RestaurantImageView: View {
 
   var body: some View {
     Group {
-      if let doorImage = restaurant.doorImage, let doorImageURL = URL(string: doorImage) {
-        AsyncImage(url: doorImageURL) { phase in
-          switch phase {
-          case .empty:
-            ImagePlaceholder()
-          case .success(let image):
-            image
-              .resizable()
-              .aspectRatio(contentMode: .fill)
-          case .failure:
-            ImagePlaceholder()
-          @unknown default:
-            ImagePlaceholder()
-          }
-        }
-      } else if let firstImage = restaurant.images.first,
-        let firstImageURL = URL(string: firstImage)
-      {
-        AsyncImage(url: firstImageURL) { phase in
+      if let imageURL = restaurant.primaryImageURL {
+        AsyncImage(url: imageURL) { phase in
           switch phase {
           case .empty:
             ImagePlaceholder()

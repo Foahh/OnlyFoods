@@ -9,23 +9,6 @@ import PhotosUI
 import SwiftData
 import SwiftUI
 
-struct ConfirmButton: View {
-  let action: () -> Void
-  var body: some View {
-    if #available(iOS 26.0, *) {
-      Button(role: .confirm) {
-        action()
-      } label: {
-        Image(systemName: "arrow.up")
-      }
-    } else {
-      Button(action: action) {
-        Text("Confirm")
-      }
-    }
-  }
-}
-
 struct PostReviewView: View {
   @Environment(\.modelContext) private var modelContext
   @Environment(\.dismiss) private var dismiss

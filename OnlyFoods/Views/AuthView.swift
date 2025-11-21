@@ -16,53 +16,38 @@ struct AuthView: View {
 
   @State private var username: String = ""
   @State private var errorMessage: String?
+  @FocusState private var isUsernameFocused: Bool
 
   var body: some View {
     NavigationStack {
       VStack(spacing: 24) {
-        Image(systemName: "fork.knife.circle.fill")
-          .font(.system(size: 80))
-          .foregroundColor(.blue)
+        AuthHeaderView()
 
-        Text("OnlyFoods")
-          .font(.largeTitle)
-          .fontWeight(.bold)
-
-        Text("Discover restaurants nearby")
-          .font(.subheadline)
-          .foregroundColor(.secondary)
-
-        VStack(spacing: 16) {
-          TextField("Username", text: $username)
-            .textFieldStyle(.roundedBorder)
-            .autocapitalization(.none)
-
-          if let error = errorMessage {
-            Text(error)
-              .font(.caption)
-              .foregroundColor(.red)
-          }
-
-          Button {
-            authenticate()
-          } label: {
-            Text("Continue")
-              .font(.headline)
-              .foregroundColor(.white)
-              .frame(maxWidth: .infinity)
-              .padding()
-              .background(username.isEmpty ? Color.gray : Color.blue)
-              .cornerRadius(10)
-          }
-          .disabled(username.isEmpty)
+        VStack(spacing: 20) {
+          UsernameInputField(
+            username: $username,
+            errorMessage: $errorMessage,
+            isFocused: $isUsernameFocused,
+            onSubmit: {
+              if !username.isEmpty {
+                authenticate()
+              }
+            }
+          )
         }
-        .padding(.horizontal, 32)
+        .padding(.horizontal, 24)
 
         Spacer()
       }
-      .padding()
+      .padding(.vertical)
       .navigationTitle("Welcome")
       .navigationBarTitleDisplayMode(.inline)
+      .onAppear {
+        // Auto-focus the username field when view appears
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+          isUsernameFocused = true
+        }
+      }
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
           Button(role: .cancel) {
@@ -70,6 +55,13 @@ struct AuthView: View {
           } label: {
             Image(systemName: "xmark")
           }
+        }
+        ToolbarItem(placement: .confirmationAction) {
+          ConfirmButton(
+            action: authenticate,
+            icon: "arrow.right",
+            disabled: username.isEmpty
+          )
         }
       }
     }
@@ -94,6 +86,73 @@ struct AuthView: View {
       dismiss()
       print("Account created and logged in for user: \(newUser.username)")
     }
+  }
+}
+
+struct AuthHeaderView: View {
+  var body: some View {
+    VStack(spacing: 8) {
+      Image(systemName: "fork.knife.circle.fill")
+        .font(.system(size: 80))
+        .foregroundColor(.blue)
+
+      Text("OnlyFoods")
+        .font(.largeTitle)
+        .fontWeight(.bold)
+
+      Text("Discover restaurants nearby")
+        .font(.subheadline)
+        .foregroundColor(.secondary)
+    }
+  }
+}
+
+struct UsernameInputField: View {
+  @Binding var username: String
+  @Binding var errorMessage: String?
+  @FocusState.Binding var isFocused: Bool
+  var onSubmit: () -> Void
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 8) {
+      TextField("Username", text: $username)
+        .textInputAutocapitalization(.never)
+        .autocorrectionDisabled()
+        .textContentType(.username)
+        .submitLabel(.continue)
+        .focused($isFocused)
+        .onSubmit {
+          onSubmit()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(Color(.systemGray6))
+        .cornerRadius(10)
+        .overlay(
+          RoundedRectangle(cornerRadius: 10)
+            .stroke(isFocused ? Color.accentColor : Color.clear, lineWidth: 2)
+        )
+
+      if let error = errorMessage {
+        ErrorMessageView(message: error)
+          .animation(.easeInOut, value: errorMessage)
+      }
+    }
+  }
+}
+
+struct ErrorMessageView: View {
+  let message: String
+
+  var body: some View {
+    HStack(spacing: 4) {
+      Image(systemName: "exclamationmark.circle.fill")
+        .font(.caption)
+      Text(message)
+        .font(.caption)
+    }
+    .foregroundColor(.red)
+    .transition(.opacity.combined(with: .move(edge: .top)))
   }
 }
 
