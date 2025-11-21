@@ -14,6 +14,7 @@ struct ExploreTabView: View {
   @Query private var users: [UserModel]
   @StateObject private var restaurantService = RestaurantService.shared
   @StateObject private var searchService = SearchService.shared
+  @StateObject private var timeService = TimeService.shared
 
   var filteredRestaurants: [RestaurantModel] {
     var filtered = restaurantService.restaurants
@@ -66,7 +67,6 @@ struct ExploreTabView: View {
         }
       }
       .navigationTitle("Explore")
-
       .navigationBarTitleDisplayMode(.large)
     }
   }
@@ -105,9 +105,10 @@ struct RestaurantCardView: View {
   let restaurant: RestaurantModel
   let reviews: [ReviewModel]
   let users: [UserModel]
+  @StateObject private var timeService = TimeService.shared
 
   var isOpenNow: Bool {
-    restaurant.businessHours?.isCurrentlyOpen() ?? false
+    restaurant.isOpen(at: timeService.currentTime)
   }
 
   var rating: RestaurantRating {
