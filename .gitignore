@@ -65,4 +65,7 @@ fastlane/screenshots/**/*.png
 fastlane/test_output
 
 # Scraped
-OnlyFoods/Data/restaurants-openrice.json
+OnlyFoods/Data/Restaurants/openrice.json
+OnlyFoods/Data/Restaurants/mock.json
+
+**/.DS_Store

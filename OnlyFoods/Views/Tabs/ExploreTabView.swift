@@ -253,8 +253,6 @@ struct RestaurantImageView: View {
   }
 }
 
-// Shared components are now in Views/Components/RestaurantComponents.swift
-
 #Preview {
   ExploreTabView()
     .previewContainer(withMockData: true)

@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 /// Preview helper for setting up SwiftUI previews with SwiftData
-struct PreviewHelpers {
+struct PreviewUtility {
   /// Creates an in-memory ModelContainer for previews
   static func createPreviewContainer(
     withMockData: Bool = false,
@@ -94,8 +94,8 @@ struct PreviewHelpers {
 extension View {
   /// Wraps a view with preview ModelContainer
   func previewContainer(withMockData: Bool = false) -> some View {
-    let container = PreviewHelpers.createPreviewContainer(withMockData: withMockData)
-    let userManager = PreviewHelpers.createPreviewUserManager(withMockUser: withMockData)
+    let container = PreviewUtility.createPreviewContainer(withMockData: withMockData)
+    let userManager = PreviewUtility.createPreviewUserManager(withMockUser: withMockData)
 
     // Set modelContext on UserManager so it can load users
     userManager.setModelContext(container.mainContext)
