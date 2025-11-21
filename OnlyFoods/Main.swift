@@ -28,7 +28,7 @@ struct Main: App {
 
   var body: some Scene {
     WindowGroup {
-      MainTabView()
+      ContentView()
         .environmentObject(userManager)
         .onAppear {
           userManager.setModelContext(sharedModelContainer.mainContext)
