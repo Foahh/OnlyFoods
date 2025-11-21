@@ -52,5 +52,5 @@ struct MainTabView: View {
 
 #Preview {
   MainTabView()
-    .previewContainerWithUserManager()
+    .previewContainer()
 }

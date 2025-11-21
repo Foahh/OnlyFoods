@@ -290,5 +290,5 @@ struct UserReviewRowView: View {
 
 #Preview {
   ProfileTabView()
-    .previewContainerWithUserManager()
+    .previewContainer()
 }
