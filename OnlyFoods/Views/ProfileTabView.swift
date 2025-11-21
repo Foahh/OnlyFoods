@@ -289,9 +289,6 @@ struct UserReviewRowView: View {
 }
 
 #Preview {
-  let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(for: ReviewModel.self, UserModel.self, configurations: config)
-
-  return ProfileTabView()
-    .modelContainer(container)
+  ProfileTabView()
+    .previewContainerWithUserManager()
 }

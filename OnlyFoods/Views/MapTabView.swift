@@ -12,6 +12,7 @@ struct MapTabView: View {
   @Environment(\.modelContext) private var modelContext
   @Query private var reviews: [ReviewModel]
   @StateObject private var restaurantService = RestaurantService.shared
+  @StateObject private var searchService = SearchService.shared
 
   //  private let initialRegion = MKCoordinateRegion(
   //			center: CLLocationCoordinate2D(latitude: 22.3193, longitude: 114.1694),
@@ -27,10 +28,6 @@ struct MapTabView: View {
   @State private var visibleRegion: MKCoordinateRegion?
   @State private var selectedRestaurant: RestaurantModel?
   @State private var cameraPosition: MapCameraPosition = .automatic
-
-  @State private var showSearchView = false
-  @State private var searchText = ""
-  @State private var selectedCategory: String?
 
   var filteredRestaurants: [RestaurantModel] {
     var filtered = restaurantService.restaurants
@@ -54,14 +51,16 @@ struct MapTabView: View {
       }
     }
 
-    if !searchText.isEmpty {
+    if !searchService.searchText.isEmpty {
       filtered = filtered.filter { restaurant in
-        restaurant.name.localizedCaseInsensitiveContains(searchText)
-          || restaurant.categories.contains { $0.localizedCaseInsensitiveContains(searchText) }
+        restaurant.name.localizedCaseInsensitiveContains(searchService.searchText)
+          || restaurant.categories.contains {
+            $0.localizedCaseInsensitiveContains(searchService.searchText)
+          }
       }
     }
 
-    if let category = selectedCategory {
+    if let category = searchService.selectedCategory {
       filtered = filtered.filter { $0.categories.contains(category) }
     }
 
@@ -135,22 +134,6 @@ struct MapTabView: View {
         }
       }
       .navigationTitle("Map")
-      .toolbar {
-        ToolbarItem(placement: .navigationBarTrailing) {
-          Button {
-            showSearchView = true
-          } label: {
-            Image(systemName: "magnifyingglass")
-          }
-        }
-      }
-      .sheet(isPresented: $showSearchView) {
-        SearchView(
-          searchText: $searchText,
-          selectedCategory: $selectedCategory,
-          restaurants: restaurantService.restaurants
-        )
-      }
       .sheet(item: $selectedRestaurant) { restaurant in
         RestaurantDetailView(restaurant: restaurant)
       }
@@ -159,9 +142,6 @@ struct MapTabView: View {
 }
 
 #Preview {
-  let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(for: ReviewModel.self, UserModel.self, configurations: config)
-
-  return MapTabView()
-    .modelContainer(container)
+  MapTabView()
+    .previewContainer()
 }

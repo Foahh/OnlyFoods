@@ -1,1 +1,110 @@
-[]
+[
+  {
+    "id": "mock-restaurant-001",
+    "name": "Mock Restaurant 001",
+    "latitude": 22.2819,
+    "longitude": 114.1583,
+    "categories": [
+      "Chinese",
+      "Cantonese",
+      "Dim Sum"
+    ],
+    "services": [
+      "Wi-Fi",
+      "Alcoholic Drinks",
+      "Phone Reservation",
+      "Private Room",
+      "10% Service Charge"
+    ],
+    "paymentMethods": [
+      "Visa",
+      "Master",
+      "Cash",
+      "UnionPay",
+      "Alipay",
+      "WeChat Pay"
+    ],
+    "contactPhone": "21234567",
+    "addressString": "123 Main Street, Central, Hong Kong",
+    "priceLevel": 2,
+    "businessHours": [
+      {
+        "dayOfWeek": 1,
+        "periods": [
+          {
+            "start": "10:00:00",
+            "end": "22:00:00"
+          }
+        ],
+        "isClosed": false,
+        "is24hr": false
+      },
+      {
+        "dayOfWeek": 2,
+        "periods": [
+          {
+            "start": "10:00:00",
+            "end": "22:00:00"
+          }
+        ],
+        "isClosed": false,
+        "is24hr": false
+      },
+      {
+        "dayOfWeek": 3,
+        "periods": [
+          {
+            "start": "10:00:00",
+            "end": "22:00:00"
+          }
+        ],
+        "isClosed": false,
+        "is24hr": false
+      },
+      {
+        "dayOfWeek": 4,
+        "periods": [
+          {
+            "start": "10:00:00",
+            "end": "22:00:00"
+          }
+        ],
+        "isClosed": false,
+        "is24hr": false
+      },
+      {
+        "dayOfWeek": 5,
+        "periods": [
+          {
+            "start": "10:00:00",
+            "end": "22:00:00"
+          }
+        ],
+        "isClosed": false,
+        "is24hr": false
+      },
+      {
+        "dayOfWeek": 6,
+        "periods": [
+          {
+            "start": "09:00:00",
+            "end": "23:00:00"
+          }
+        ],
+        "isClosed": false,
+        "is24hr": false
+      },
+      {
+        "dayOfWeek": 7,
+        "periods": [
+          {
+            "start": "09:00:00",
+            "end": "23:00:00"
+          }
+        ],
+        "isClosed": false,
+        "is24hr": false
+      }
+    ]
+  }
+]

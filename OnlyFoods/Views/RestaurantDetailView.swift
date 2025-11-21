@@ -86,8 +86,8 @@ struct RestaurantDetailView: View {
                 .font(.largeTitle)
                 .fontWeight(.bold)
 
-              if rating.averageRating >= 1.0 {
-                HStack(spacing: 4) {
+              HStack(spacing: 4) {
+                if rating.reviewCount > 0 {
                   Image(systemName: "star.fill")
                     .foregroundColor(.yellow)
                   Text(String(format: "%.1f", rating.averageRating))
@@ -95,6 +95,13 @@ struct RestaurantDetailView: View {
                   Text("(\(rating.reviewCount) reviews)")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
+                } else {
+                  Image(systemName: "star")
+                    .foregroundColor(.secondary.opacity(0.3))
+                  Text("No ratings yet")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .italic()
                 }
               }
             }
@@ -275,10 +282,7 @@ struct ReviewRowView: View {
 }
 
 #Preview {
-  let config = ModelConfiguration(isStoredInMemoryOnly: true)
-  let container = try! ModelContainer(for: ReviewModel.self, UserModel.self, configurations: config)
-
-  return RestaurantDetailView(
+  RestaurantDetailView(
     restaurant: RestaurantModel(
       id: "test-restaurant-id",
       name: "Sample Restaurant",
@@ -287,5 +291,5 @@ struct ReviewRowView: View {
       categories: ["Italian"]
     )
   )
-  .modelContainer(container)
+  .previewContainer(withMockData: true)
 }
