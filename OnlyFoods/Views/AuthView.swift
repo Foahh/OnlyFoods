@@ -97,5 +97,5 @@ struct AuthView: View {
 
 #Preview {
   AuthView()
-    .previewContainerWithUserManager()
+    .previewContainer()
 }

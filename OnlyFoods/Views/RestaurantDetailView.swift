@@ -15,6 +15,7 @@ struct RestaurantDetailView: View {
   @Query private var reviews: [ReviewModel]
   @Query private var users: [UserModel]
   @StateObject private var restaurantService = RestaurantService.shared
+  @StateObject private var timeService = TimeService.shared
   @State private var showAddReview = false
   @State private var currentRestaurant: RestaurantModel
 
@@ -35,159 +36,250 @@ struct RestaurantDetailView: View {
     currentRestaurant.rating(from: reviews)
   }
 
+  var isOpenNow: Bool {
+    currentRestaurant.isOpen(at: timeService.currentTime)
+  }
+
+  private var priceText: String? {
+    guard let level = currentRestaurant.priceLevel, level > 0 else { return nil }
+    return String(repeating: "$", count: level)
+  }
+
+  private var favoriteCount: Int {
+    RestaurantService.shared.getFavoriteCount(for: currentRestaurant.id, from: users)
+  }
+
+  private var visitedCount: Int {
+    RestaurantService.shared.getVisitedCount(for: currentRestaurant.id, from: users)
+  }
+
   var body: some View {
     ScrollView {
-      VStack(alignment: .leading, spacing: 16) {
-        // Images - show doorImage first if available, then other images
-        if currentRestaurant.doorImage != nil || !currentRestaurant.images.isEmpty {
-          ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
-              // Show doorImage first if available
-              if let doorImage = currentRestaurant.doorImage,
-                let doorImageURL = URL(string: doorImage)
-              {
-                AsyncImage(url: doorImageURL) { image in
-                  image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                } placeholder: {
-                  Rectangle()
-                    .fill(Color.gray.opacity(0.3))
-                }
-                .frame(width: 300, height: 200)
-                .cornerRadius(12)
-              }
-
-              // Show other images
-              ForEach(currentRestaurant.images, id: \.self) { imageURL in
-                if let url = URL(string: imageURL) {
-                  AsyncImage(url: url) { image in
-                    image
-                      .resizable()
-                      .aspectRatio(contentMode: .fill)
-                  } placeholder: {
-                    Rectangle()
-                      .fill(Color.gray.opacity(0.3))
-                  }
-                  .frame(width: 300, height: 200)
-                  .cornerRadius(12)
-                }
-              }
-            }
-            .padding(.horizontal)
-          }
-        }
-
-        VStack(alignment: .leading, spacing: 12) {
-          // Name and Rating
-          HStack {
-            VStack(alignment: .leading, spacing: 4) {
+      VStack {
+        // Content Section
+        VStack(alignment: .leading, spacing: 20) {
+          // Header: Name, Rating, and Favorite Button
+          VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 8) {
               Text(currentRestaurant.name)
                 .font(.largeTitle)
                 .fontWeight(.bold)
+                .foregroundStyle(.primary)
 
-              HStack(spacing: 4) {
-                if rating.reviewCount > 0 {
-                  Image(systemName: "star.fill")
-                    .foregroundColor(.yellow)
-                  Text(String(format: "%.1f", rating.averageRating))
-                    .font(.title3)
-                  Text("(\(rating.reviewCount) reviews)")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                } else {
-                  Image(systemName: "star")
-                    .foregroundColor(.secondary.opacity(0.3))
-                  Text("No ratings yet")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .italic()
-                }
-              }
+              RatingView(rating: rating)
             }
 
             Spacer()
 
             if let user = currentUser {
-              Button {
-                if user.isFavorite(restaurantID: currentRestaurant.id) {
-                  user.removeFavorite(restaurantID: currentRestaurant.id)
-                } else {
-                  user.addFavorite(restaurantID: currentRestaurant.id)
+              HStack(spacing: 12) {
+                Button {
+                  if user.isVisited(restaurantID: currentRestaurant.id) {
+                    user.removeVisited(restaurantID: currentRestaurant.id)
+                  } else {
+                    user.addVisited(restaurantID: currentRestaurant.id)
+                  }
+                } label: {
+                  HStack {
+                    Image(
+                      systemName: user.isVisited(restaurantID: currentRestaurant.id)
+                        ? "checkmark.circle.fill" : "checkmark.circle"
+                    )
+                    .font(.title3)
+                    Text("Visited")
+                      .font(.headline)
+                  }
+                  .frame(maxWidth: .infinity)
+                  .frame(height: 50)
+                  .foregroundStyle(
+                    user.isVisited(restaurantID: currentRestaurant.id) ? .white : .blue
+                  )
+                  .background(
+                    user.isVisited(restaurantID: currentRestaurant.id)
+                      ? Color.blue : Color.blue.opacity(0.1)
+                  )
+                  .clipShape(Capsule())
                 }
-              } label: {
-                Image(
-                  systemName: user.isFavorite(restaurantID: currentRestaurant.id)
-                    ? "heart.fill" : "heart"
-                )
-                .font(.title2)
-                .foregroundColor(user.isFavorite(restaurantID: currentRestaurant.id) ? .red : .gray)
+
+                Button {
+                  if user.isFavorite(restaurantID: currentRestaurant.id) {
+                    user.removeFavorite(restaurantID: currentRestaurant.id)
+                  } else {
+                    user.addFavorite(restaurantID: currentRestaurant.id)
+                  }
+                } label: {
+                  HStack {
+                    Image(
+                      systemName: user.isFavorite(restaurantID: currentRestaurant.id)
+                        ? "heart.fill" : "heart"
+                    )
+                    .font(.title3)
+                    Text("Favorite")
+                      .font(.headline)
+                  }
+                  .frame(maxWidth: .infinity)
+                  .frame(height: 50)
+                  .foregroundStyle(
+                    user.isFavorite(restaurantID: currentRestaurant.id) ? .white : .red
+                  )
+                  .background(
+                    user.isFavorite(restaurantID: currentRestaurant.id)
+                      ? Color.red : Color.red.opacity(0.1)
+                  )
+                  .clipShape(Capsule())
+                }
+              }
+            }
+
+            // Favorite/Visited Counts
+            HStack(spacing: 20) {
+              HStack(spacing: 6) {
+                Image(systemName: favoriteCount > 0 ? "heart.fill" : "heart")
+                  .font(.subheadline)
+                  .foregroundStyle(favoriteCount > 0 ? .red : .secondary.opacity(0.5))
+                if favoriteCount > 0 {
+                  Text("\(favoriteCount) favorites")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                } else {
+                  Text("No favorites yet")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary.opacity(0.6))
+                    .italic()
+                }
+              }
+
+              HStack(spacing: 6) {
+                Image(systemName: visitedCount > 0 ? "checkmark.circle.fill" : "checkmark.circle")
+                  .font(.subheadline)
+                  .foregroundStyle(visitedCount > 0 ? .blue : .secondary.opacity(0.5))
+                if visitedCount > 0 {
+                  Text("\(visitedCount) visits")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                } else {
+                  Text("No visits yet")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary.opacity(0.6))
+                    .italic()
+                }
               }
             }
           }
 
-          // Categories
-          if !currentRestaurant.categories.isEmpty {
-            ScrollView(.horizontal, showsIndicators: false) {
-              HStack(spacing: 8) {
-                ForEach(currentRestaurant.categories, id: \.self) { category in
-                  Text(category)
-                    .font(.subheadline)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Color.blue.opacity(0.1))
-                    .foregroundColor(.blue)
-                    .cornerRadius(12)
+          // Categories and Price
+          if !currentRestaurant.categories.isEmpty || priceText != nil {
+            CategoryChipsView(
+              categories: currentRestaurant.categories,
+              priceText: priceText
+            )
+          }
+
+          Divider()
+            .padding(.vertical, 8)
+
+          // Additional Images Gallery
+          if currentRestaurant.images.count > 1
+            || (currentRestaurant.doorImage != nil && !currentRestaurant.images.isEmpty)
+          {
+            VStack(alignment: .leading, spacing: 12) {
+              Text("Photos")
+                .font(.headline)
+                .foregroundStyle(.primary)
+
+              ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                  // Show doorImage if available and not already shown
+                  if let doorImage = currentRestaurant.doorImage,
+                    let doorImageURL = URL(string: doorImage)
+                  {
+                    RestaurantImageItem(url: doorImageURL)
+                  }
+
+                  // Show other images
+                  ForEach(currentRestaurant.images, id: \.self) { imageURL in
+                    if let url = URL(string: imageURL) {
+                      RestaurantImageItem(url: url)
+                    }
+                  }
                 }
+                .padding(.horizontal, 4)
               }
             }
           }
 
           Divider()
+            .padding(.vertical, 8)
 
           // Location Map
-          Text("Location")
-            .font(.headline)
-          RestaurantMapView(
-            latitude: currentRestaurant.latitude,
-            longitude: currentRestaurant.longitude,
-            restaurantName: currentRestaurant.name
-          )
-          .frame(height: 200)
-          .cornerRadius(12)
-
-          Divider()
-
-          // Reviews Section
-          HStack {
-            Text("Reviews")
+          VStack(alignment: .leading, spacing: 12) {
+            Text("Location")
               .font(.headline)
-            Spacer()
-            if currentUser != nil {
-              Button {
-                showAddReview = true
-              } label: {
-                Label("Add Review", systemImage: "plus.circle.fill")
-                  .font(.subheadline)
-              }
-            }
+              .foregroundStyle(.primary)
+
+            RestaurantMapView(
+              latitude: currentRestaurant.latitude,
+              longitude: currentRestaurant.longitude,
+              restaurantName: currentRestaurant.name
+            )
+            .frame(height: 200)
+            .cornerRadius(12)
+            .overlay(
+              RoundedRectangle(cornerRadius: 12)
+                .stroke(Color(.separator), lineWidth: 0.5)
+            )
           }
 
-          if restaurantReviews.isEmpty {
-            Text("No reviews yet. Be the first to review!")
-              .font(.subheadline)
-              .foregroundColor(.secondary)
-              .padding()
+          Divider()
+            .padding(.vertical, 8)
+
+          // Reviews Section
+          VStack(alignment: .leading, spacing: 12) {
+            HStack {
+              Text("Reviews")
+                .font(.headline)
+                .foregroundStyle(.primary)
+              Spacer()
+              if currentUser != nil {
+                Button {
+                  showAddReview = true
+                } label: {
+                  Label("Add Review", systemImage: "plus.circle.fill")
+                    .font(.subheadline)
+                    .foregroundStyle(.blue)
+                }
+              }
+            }
+
+            if restaurantReviews.isEmpty {
+              VStack(spacing: 12) {
+                Image(systemName: "star.bubble")
+                  .font(.system(size: 48))
+                  .foregroundStyle(.secondary.opacity(0.5))
+                Text("No reviews yet")
+                  .font(.headline)
+                  .foregroundStyle(.primary)
+                if currentUser != nil {
+                  Text("Be the first to review this restaurant!")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                }
+              }
               .frame(maxWidth: .infinity)
-              .background(Color.gray.opacity(0.1))
-              .cornerRadius(8)
-          } else {
-            ForEach(restaurantReviews) { review in
-              ReviewRowView(review: review, users: users)
+              .padding(.vertical, 32)
+              .background(Color(.systemGray6))
+              .cornerRadius(12)
+            } else {
+              LazyVStack(spacing: 16) {
+                ForEach(restaurantReviews) { review in
+                  ReviewRowView(review: review, users: users)
+                }
+              }
             }
           }
         }
-        .padding()
+        .padding(20)
       }
     }
     .navigationBarTitleDisplayMode(.inline)
@@ -208,76 +300,198 @@ struct ReviewRowView: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      HStack {
+    VStack(alignment: .leading, spacing: 12) {
+      // User Info and Rating
+      HStack(alignment: .top, spacing: 12) {
+        // Avatar
         if let user = reviewUser {
-          if let avatar = user.avatar {
-            AsyncImage(url: URL(string: avatar)) { image in
-              image
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-            } placeholder: {
-              Circle()
-                .fill(Color.gray.opacity(0.3))
+          if let avatar = user.avatar, let avatarURL = URL(string: avatar) {
+            AsyncImage(url: avatarURL) { phase in
+              switch phase {
+              case .empty:
+                AvatarPlaceholder()
+              case .success(let image):
+                image
+                  .resizable()
+                  .aspectRatio(contentMode: .fill)
+              case .failure:
+                AvatarPlaceholder()
+              @unknown default:
+                AvatarPlaceholder()
+              }
             }
-            .frame(width: 40, height: 40)
+            .frame(width: 44, height: 44)
             .clipShape(Circle())
           } else {
-            Circle()
-              .fill(Color.gray.opacity(0.3))
-              .frame(width: 40, height: 40)
-              .overlay {
-                Image(systemName: "person.fill")
-                  .foregroundColor(.gray)
-              }
+            AvatarPlaceholder()
+              .frame(width: 44, height: 44)
           }
-          Text(user.username)
-            .font(.headline)
         } else {
-          Text("Anonymous")
-            .font(.headline)
+          AvatarPlaceholder()
+            .frame(width: 44, height: 44)
         }
 
-        Spacer()
+        VStack(alignment: .leading, spacing: 6) {
+          HStack {
+            Text(reviewUser?.username ?? "Anonymous")
+              .font(.headline)
+              .foregroundStyle(.primary)
 
-        HStack(spacing: 4) {
-          ForEach(1...5, id: \.self) { star in
-            Image(systemName: star <= review.rating ? "star.fill" : "star")
-              .foregroundColor(.yellow)
-              .font(.caption)
+            Spacer()
+
+            // Star Rating
+            HStack(spacing: 2) {
+              ForEach(1...5, id: \.self) { star in
+                Image(systemName: star <= review.rating ? "star.fill" : "star")
+                  .foregroundStyle(star <= review.rating ? .yellow : .yellow.opacity(0.3))
+                  .font(.caption)
+              }
+            }
           }
+
+          Text(review.timestamp, style: .relative)
+            .font(.caption)
+            .foregroundStyle(.secondary)
         }
       }
 
-      Text(review.comment)
-        .font(.body)
+      // Review Comment
+      if !review.comment.isEmpty {
+        Text(review.comment)
+          .font(.body)
+          .foregroundStyle(.primary)
+          .fixedSize(horizontal: false, vertical: true)
+      }
 
+      // Review Images
       if !review.images.isEmpty {
         ScrollView(.horizontal, showsIndicators: false) {
           HStack(spacing: 8) {
             ForEach(review.images, id: \.self) { imageURL in
-              AsyncImage(url: URL(string: imageURL)) { image in
-                image
-                  .resizable()
-                  .aspectRatio(contentMode: .fill)
-              } placeholder: {
-                Rectangle()
-                  .fill(Color.gray.opacity(0.3))
+              if let url = URL(string: imageURL) {
+                AsyncImage(url: url) { phase in
+                  switch phase {
+                  case .empty:
+                    ReviewImagePlaceholder()
+                  case .success(let image):
+                    image
+                      .resizable()
+                      .aspectRatio(contentMode: .fill)
+                  case .failure:
+                    ReviewImagePlaceholder()
+                  @unknown default:
+                    ReviewImagePlaceholder()
+                  }
+                }
+                .frame(width: 100, height: 100)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
               }
-              .frame(width: 100, height: 100)
-              .cornerRadius(8)
             }
           }
         }
       }
-
-      Text(review.timestamp, style: .relative)
-        .font(.caption)
-        .foregroundColor(.secondary)
     }
-    .padding()
-    .background(Color.gray.opacity(0.05))
+    .padding(16)
+    .background(Color(.systemBackground))
     .cornerRadius(12)
+    .overlay(
+      RoundedRectangle(cornerRadius: 12)
+        .stroke(Color(.separator), lineWidth: 0.5)
+    )
+    .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+  }
+}
+
+// MARK: - Supporting Views
+
+struct RestaurantDetailImageView: View {
+  let restaurant: RestaurantModel
+
+  var body: some View {
+    Group {
+      if let doorImage = restaurant.doorImage, let doorImageURL = URL(string: doorImage) {
+        AsyncImage(url: doorImageURL) { phase in
+          switch phase {
+          case .empty:
+            ImagePlaceholder()
+          case .success(let image):
+            image
+              .resizable()
+              .aspectRatio(contentMode: .fill)
+          case .failure:
+            ImagePlaceholder()
+          @unknown default:
+            ImagePlaceholder()
+          }
+        }
+      } else if let firstImage = restaurant.images.first,
+        let firstImageURL = URL(string: firstImage)
+      {
+        AsyncImage(url: firstImageURL) { phase in
+          switch phase {
+          case .empty:
+            ImagePlaceholder()
+          case .success(let image):
+            image
+              .resizable()
+              .aspectRatio(contentMode: .fill)
+          case .failure:
+            ImagePlaceholder()
+          @unknown default:
+            ImagePlaceholder()
+          }
+        }
+      } else {
+        ImagePlaceholder()
+      }
+    }
+  }
+}
+
+struct RestaurantImageItem: View {
+  let url: URL
+
+  var body: some View {
+    AsyncImage(url: url) { phase in
+      switch phase {
+      case .empty:
+        ImagePlaceholder()
+      case .success(let image):
+        image
+          .resizable()
+          .aspectRatio(contentMode: .fill)
+      case .failure:
+        ImagePlaceholder()
+      @unknown default:
+        ImagePlaceholder()
+      }
+    }
+    .frame(width: 200, height: 150)
+    .clipShape(RoundedRectangle(cornerRadius: 12))
+  }
+}
+
+struct AvatarPlaceholder: View {
+  var body: some View {
+    Circle()
+      .fill(Color(.systemGray5))
+      .overlay {
+        Image(systemName: "person.fill")
+          .font(.system(size: 20))
+          .foregroundStyle(.secondary.opacity(0.6))
+      }
+  }
+}
+
+struct ReviewImagePlaceholder: View {
+  var body: some View {
+    RoundedRectangle(cornerRadius: 8)
+      .fill(Color(.systemGray5))
+      .overlay {
+        Image(systemName: "photo")
+          .font(.system(size: 24))
+          .foregroundStyle(.secondary.opacity(0.5))
+      }
   }
 }
 
