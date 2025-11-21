@@ -18,7 +18,6 @@ struct FullScreenImageView<Placeholder: View>: View {
       Color.black.ignoresSafeArea()
 
       fullScreenContent
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
 
       Button {
@@ -82,29 +81,4 @@ private struct DefaultFullScreenImagePlaceholder: View {
           .foregroundStyle(.secondary.opacity(0.8))
       }
   }
-}
-
-#Preview {
-  struct PreviewWrapper: View {
-    @State private var showImage = true
-
-    var body: some View {
-      ZStack {
-        Color.gray.opacity(0.3)
-          .ignoresSafeArea()
-
-        Button("Show Image Preview") {
-          showImage = true
-        }
-        .buttonStyle(.borderedProminent)
-      }
-      .fullScreenCover(isPresented: $showImage) {
-        FullScreenImageView(
-          imageSource: "https://picsum.photos/800/1200"
-        )
-      }
-    }
-  }
-
-  return PreviewWrapper()
 }
