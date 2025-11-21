@@ -216,7 +216,7 @@ struct AddReviewView: View {
       longitude: 114.1694,
       categories: ["Italian"]
     ),
-    user: PreviewHelpers.createMockUser(username: "TestUser")
+    user: PreviewUtility.createMockUser(username: "TestUser")
   )
   .previewContainer()
 }
