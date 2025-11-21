@@ -36,10 +36,10 @@ struct TimeRange: Codable {
     return contains(time: currentTimeString)
   }
 
-  /// Parses a time string in "HH:mm" format to minutes since midnight
+  /// Parses a time string in "HH:mm" or "HH:mm:ss" format to minutes since midnight
   private func parseTime(_ timeString: String) -> Int? {
     let components = timeString.split(separator: ":")
-    guard components.count == 2,
+    guard components.count >= 2,
       let hours = Int(components[0]),
       let minutes = Int(components[1]),
       hours >= 0 && hours < 24,
