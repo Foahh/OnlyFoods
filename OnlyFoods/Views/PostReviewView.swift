@@ -135,18 +135,26 @@ struct AddReviewView: View {
         //		  }
 
       }
-      .navigationTitle("Add Review")
+      .navigationTitle("Edit Post")
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
-          Button("Cancel") {
+          Button {
             dismiss()
+          } label: {
+            Image(systemName: "xmark")
           }
+          .tint(.red)
+          .accessibilityLabel("Cancel")
         }
         ToolbarItem(placement: .confirmationAction) {
-          Button("Submit") {
+          Button {
             submitReview()
+          } label: {
+            Image(systemName: "paperplane.fill")
           }
+          .tint(.blue)
+          .accessibilityLabel("Submit review")
           .disabled(comment.isEmpty)
         }
       }

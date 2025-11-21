@@ -65,8 +65,10 @@ struct AuthView: View {
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
-          Button("Cancel") {
+          Button(role: .cancel) {
             dismiss()
+          } label: {
+            Image(systemName: "xmark")
           }
         }
       }
