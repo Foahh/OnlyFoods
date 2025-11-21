@@ -72,29 +72,29 @@ struct RestaurantRowView: View {
   let restaurant: RestaurantModel
   let reviews: [ReviewModel]
 
-	var isOpenNow: Bool {
-			// default closed if businessHours is empty
-			restaurant.businessHours?.isCurrentlyOpen() ?? false
-		}
-	
+  var isOpenNow: Bool {
+    // default closed if businessHours is empty
+    restaurant.businessHours?.isCurrentlyOpen() ?? false
+  }
+
   var rating: RestaurantRating {
     restaurant.rating(from: reviews)
   }
-	
-	// convert priceLevel into "$", "$$", "$$$"
-	private var priceText: String? {
-		guard let level = restaurant.priceLevel, level > 0 else { return nil }
-		return String(repeating: "$", count: level)
-	}
-	
-	// categories + price 
-	private var categoryAndPriceText: String? {
-		var parts: [String] = restaurant.categories
-		if let price = priceText {
-			parts.append(price)
-		}
-		return parts.isEmpty ? nil : parts.joined(separator: " | ")
-	}
+
+  // convert priceLevel into "$", "$$", "$$$"
+  private var priceText: String? {
+    guard let level = restaurant.priceLevel, level > 0 else { return nil }
+    return String(repeating: "$", count: level)
+  }
+
+  // categories + price
+  private var categoryAndPriceText: String? {
+    var parts: [String] = restaurant.categories
+    if let price = priceText {
+      parts.append(price)
+    }
+    return parts.isEmpty ? nil : parts.joined(separator: " | ")
+  }
 
   var body: some View {
     HStack(spacing: 12) {
@@ -135,46 +135,46 @@ struct RestaurantRowView: View {
       }
 
       VStack(alignment: .leading, spacing: 4) {
-		  HStack() {
-			  Text(restaurant.name)
-				  .font(.headline)
-			  Spacer()
-			  if isOpenNow {
-				  Text("Open")
-					  .font(.subheadline)
-					  .foregroundColor(.green)
-					  .padding(.horizontal, 6)
-					  .padding(.vertical, 2)
-					  .background(Color.green.opacity(0.1))
-					  .clipShape(Capsule())
-			  } else {
-				  Text("Closed")
-					  .font(.subheadline)
-					  .foregroundColor(.red)
-					  .padding(.horizontal, 6)
-					  .padding(.vertical, 2)
-					  .background(Color.red.opacity(0.1))
-					  .clipShape(Capsule())
-			  }
-		  }
+        HStack {
+          Text(restaurant.name)
+            .font(.headline)
+          Spacer()
+          if isOpenNow {
+            Text("Open")
+              .font(.subheadline)
+              .foregroundColor(.green)
+              .padding(.horizontal, 6)
+              .padding(.vertical, 2)
+              .background(Color.green.opacity(0.1))
+              .clipShape(Capsule())
+          } else {
+            Text("Closed")
+              .font(.subheadline)
+              .foregroundColor(.red)
+              .padding(.horizontal, 6)
+              .padding(.vertical, 2)
+              .background(Color.red.opacity(0.1))
+              .clipShape(Capsule())
+          }
+        }
 
-		  if let text = categoryAndPriceText {
-			  Text(text)
-				  .font(.subheadline)
-				  .foregroundColor(.secondary)
-		  }
-		  if rating.averageRating >= 1.0 {
-			  HStack(spacing: 4) {
-				  Image(systemName: "star.fill")
-					  .foregroundColor(.yellow)
-					  .font(.caption)
-				  Text(String(format: "%.1f", rating.averageRating))
-					  .font(.caption)
-				  Text("(\(rating.reviewCount))")
-					  .font(.caption)
-					  .foregroundColor(.secondary)
-			  }
-		  }
+        if let text = categoryAndPriceText {
+          Text(text)
+            .font(.subheadline)
+            .foregroundColor(.secondary)
+        }
+        if rating.averageRating >= 1.0 {
+          HStack(spacing: 4) {
+            Image(systemName: "star.fill")
+              .foregroundColor(.yellow)
+              .font(.caption)
+            Text(String(format: "%.1f", rating.averageRating))
+              .font(.caption)
+            Text("(\(rating.reviewCount))")
+              .font(.caption)
+              .foregroundColor(.secondary)
+          }
+        }
       }
 
       Spacer()
