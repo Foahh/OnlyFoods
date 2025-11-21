@@ -30,7 +30,7 @@ struct RestaurantMapView: View {
   }
 
   var body: some View {
-    Map(position: $cameraPosition) {
+    Map(position: $cameraPosition, interactionModes: []) {
       Marker(
         restaurantName,
         coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
