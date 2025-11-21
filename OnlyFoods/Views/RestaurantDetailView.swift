@@ -69,8 +69,6 @@ struct RestaurantDetailView: View {
               RatingView(rating: rating)
             }
 
-            Spacer()
-
             if let user = currentUser {
               HStack(spacing: 12) {
                 Button {
@@ -176,7 +174,7 @@ struct RestaurantDetailView: View {
           }
 
           Divider()
-            .padding(.vertical, 8)
+            .padding(.top, 8)
 
           // Additional Images Gallery
           if currentRestaurant.images.count > 1
@@ -209,7 +207,7 @@ struct RestaurantDetailView: View {
           }
 
           Divider()
-            .padding(.vertical, 8)
+            .padding(.top, 8)
 
           // Location Map
           VStack(alignment: .leading, spacing: 12) {
@@ -231,7 +229,7 @@ struct RestaurantDetailView: View {
           }
 
           Divider()
-            .padding(.vertical, 8)
+            .padding(.top, 8)
 
           // Reviews Section
           VStack(alignment: .leading, spacing: 12) {

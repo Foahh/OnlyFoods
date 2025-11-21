@@ -94,7 +94,7 @@ struct PreviewHelpers {
 extension View {
   /// Wraps a view with preview ModelContainer
   func previewContainer(withMockData: Bool = false) -> some View {
-  let container = PreviewHelpers.createPreviewContainer(withMockData: withMockData)
+    let container = PreviewHelpers.createPreviewContainer(withMockData: withMockData)
     let userManager = PreviewHelpers.createPreviewUserManager(withMockUser: withMockData)
 
     // Set modelContext on UserManager so it can load users
