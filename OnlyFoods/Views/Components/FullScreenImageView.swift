@@ -14,21 +14,34 @@ struct FullScreenImageView<Placeholder: View>: View {
   }
 
   var body: some View {
-    ZStack(alignment: .topTrailing) {
+    ZStack {
       Color.black.ignoresSafeArea()
 
       fullScreenContent
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
 
-      Button {
-        dismiss()
-      } label: {
-        Image(systemName: "xmark.circle.fill")
-          .font(.system(size: 32, weight: .semibold))
-          .foregroundStyle(.white.opacity(0.9))
-          .padding()
+      VStack {
+        HStack {
+          Spacer()
+          Button {
+            dismiss()
+          } label: {
+            ZStack {
+              Circle()
+                .fill(.ultraThinMaterial)
+                .frame(width: 44, height: 44)
+              Image(systemName: "xmark")
+                .foregroundStyle(.white)
+            }
+          }
+          .modifier(GlassEffectModifier())
+          .padding(.top, 8)
+          .padding(.trailing, 8)
+          .accessibilityLabel("Close")
+        }
+        Spacer()
       }
-      .accessibilityLabel("Close")
     }
   }
 
@@ -81,4 +94,10 @@ private struct DefaultFullScreenImagePlaceholder: View {
           .foregroundStyle(.secondary.opacity(0.8))
       }
   }
+}
+
+#Preview {
+  FullScreenImageView(
+    imageSource: "https://picsum.photos/800/1200"
+  )
 }
