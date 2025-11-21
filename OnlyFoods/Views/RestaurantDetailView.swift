@@ -19,7 +19,9 @@ struct RestaurantDetailView: View {
   @StateObject private var timeService = TimeService.shared
   @State private var showAddReview = false
   @State private var currentRestaurant: RestaurantModel
-
+  @State private var showAuthView = false
+	
+	
   private var currentUser: UserModel? {
     userManager.currentUser
   }
@@ -84,8 +86,20 @@ struct RestaurantDetailView: View {
             isFavorite: currentUser?.isFavorite(restaurantID: currentRestaurant.id) ?? false,
             favoriteCount: favoriteCount,
             visitedCount: visitedCount,
-            onToggleVisited: toggleVisitedState,
-            onToggleFavorite: toggleFavoriteState
+			onToggleVisited: {
+				   if let user = currentUser {
+					   toggleVisitedState()
+				   } else {
+					   showAuthView = true
+				   }
+			   },
+		   onToggleFavorite: {
+			   if let user = currentUser {
+				   toggleFavoriteState()
+			   } else {
+				   showAuthView = true
+			   }
+		   }
           )
 
           if !currentRestaurant.categories.isEmpty || priceText != nil {
@@ -106,7 +120,13 @@ struct RestaurantDetailView: View {
             reviews: restaurantReviews,
             users: users,
             currentUser: currentUser,
-            onAddReview: { showAddReview = true }
+			onAddReview: {
+				if let user = currentUser {
+					showAddReview = true
+				} else {
+					showAuthView = true
+				}
+			}
           )
 
           RestaurantDetailLocationContactSection(
@@ -153,6 +173,9 @@ struct RestaurantDetailView: View {
         PostReviewView(restaurant: currentRestaurant, user: user)
       }
     }
+	.sheet(isPresented: $showAuthView) {
+	  AuthView()
+	}
   }
 }
 
@@ -199,26 +222,25 @@ struct RestaurantDetailHeaderSection: View {
 
         RatingView(rating: rating)
       }
+      
+		HStack(spacing: 12) {
+		  RestaurantDetailActionButton(
+			title: "Visited",
+			systemImage: hasVisited ? "checkmark.circle.fill" : "checkmark.circle",
+			isFilled: hasVisited,
+			activeColor: .blue,
+			onTap: onToggleVisited
+		  )
 
-      if currentUser != nil {
-        HStack(spacing: 12) {
-          RestaurantDetailActionButton(
-            title: "Visited",
-            systemImage: hasVisited ? "checkmark.circle.fill" : "checkmark.circle",
-            isFilled: hasVisited,
-            activeColor: .blue,
-            onTap: onToggleVisited
-          )
-
-          RestaurantDetailActionButton(
-            title: "Favorite",
-            systemImage: isFavorite ? "heart.fill" : "heart",
-            isFilled: isFavorite,
-            activeColor: .red,
-            onTap: onToggleFavorite
-          )
-        }
-      }
+		  RestaurantDetailActionButton(
+			title: "Favorite",
+			systemImage: isFavorite ? "heart.fill" : "heart",
+			isFilled: isFavorite,
+			activeColor: .red,
+			onTap: onToggleFavorite
+		  )
+	}
+      
 
       RestaurantDetailSocialStatsView(
         favoriteCount: favoriteCount,
@@ -393,6 +415,7 @@ struct RestaurantDetailLocationContactSection: View {
     ) {
       VStack(alignment: .leading, spacing: 16) {
         VStack(alignment: .leading, spacing: 12) {
+			
           if hasAddress, let address {
             InfoRow(
               icon: "mappin.and.ellipse",
@@ -476,7 +499,6 @@ struct RestaurantDetailReviewsSection: View {
       icon: "text.bubble.fill",
       accentColor: .indigo,
       headerTrailing: {
-        if currentUser != nil {
           Button(action: onAddReview) {
             Label("Post", systemImage: "plus.circle.fill")
               .font(.subheadline.weight(.semibold))
@@ -486,7 +508,7 @@ struct RestaurantDetailReviewsSection: View {
               .foregroundStyle(.blue)
               .clipShape(Capsule())
           }
-        }
+        
       }
     ) {
       VStack(alignment: .leading, spacing: 16) {
