@@ -180,11 +180,6 @@ struct ProfileTabView: View {
         }
       }
     }
-    .onAppear {
-      if userManager.currentUser == nil {
-        showAuthView = true
-      }
-    }
   }
 }
 

@@ -1,5 +1,5 @@
 //
-//  MainTabView.swift
+//  ContentView.swift
 //  OnlyFoods
 //
 //  Created by Foahh on 2025/11/12.
@@ -18,17 +18,16 @@ struct TabBarMinimizeModifier: ViewModifier {
   }
 }
 
-struct MainTabView: View {
+struct ContentView: View {
   @Environment(\.modelContext) private var modelContext
   @StateObject private var searchService = SearchService.shared
-  @State private var selectedTab = 0
+  @SceneStorage("selectedTab") private var selectedTab = 0
 
   var body: some View {
     TabView(selection: $selectedTab) {
 
       Tab("Explore", systemImage: "list.bullet", value: 0) {
         ExploreTabView()
-
       }
 
       Tab("Map", systemImage: "map", value: 1) {
@@ -38,19 +37,19 @@ struct MainTabView: View {
 
       Tab("Profile", systemImage: "person.circle", value: 2) {
         ProfileTabView()
-
       }
 
-      Tab(value: 3, role: .search) {
-        SearchView()
+      if selectedTab == 0 || selectedTab == 1 {
+        Tab(value: 3, role: .search) {
+          SearchView()
+        }
       }
-
     }
     .modifier(TabBarMinimizeModifier())
   }
 }
 
 #Preview {
-  MainTabView()
+  ContentView()
     .previewContainer()
 }
