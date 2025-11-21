@@ -161,7 +161,7 @@ struct RestaurantDetailView: View {
     .navigationBarTitleDisplayMode(.inline)
     .sheet(isPresented: $showAddReview) {
       if let user = currentUser {
-        AddReviewView(restaurant: currentRestaurant, user: user)
+        PostReviewView(restaurant: currentRestaurant, user: user)
       }
     }
   }
