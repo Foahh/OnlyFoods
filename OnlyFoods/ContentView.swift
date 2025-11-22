@@ -8,37 +8,33 @@
 import SwiftData
 import SwiftUI
 
-struct TabBarMinimizeModifier: ViewModifier {
-  func body(content: Content) -> some View {
-    if #available(iOS 26.0, *) {
-      content.tabBarMinimizeBehavior(.onScrollDown)
-    } else {
-      content
-    }
-  }
+enum TabSelection: Int, Codable {
+  case explore = 0
+  case map = 1
+  case profile = 2
+  case search = 3
 }
 
 struct ContentView: View {
   @Environment(\.modelContext) private var modelContext
-  @StateObject private var searchService = SearchService.shared
-  @SceneStorage("selectedTab") private var selectedTab = 0
+  @SceneStorage("selectedTab") private var selectedTab: TabSelection = .explore
 
   var body: some View {
     TabView(selection: $selectedTab) {
-      Tab("Explore", systemImage: "list.bullet", value: 0) {
+      Tab("Explore", systemImage: "list.bullet", value: TabSelection.explore) {
         ExploreTabView()
       }
 
-      Tab("Map", systemImage: "map", value: 1) {
+      Tab("Map", systemImage: "map", value: TabSelection.map) {
         MapTabView()
       }
 
-      Tab("Profile", systemImage: "person.circle", value: 2) {
+      Tab("Profile", systemImage: "person.circle", value: TabSelection.profile) {
         ProfileTabView()
       }
 
-      Tab(value: 3, role: .search) {
-        ExploreTabView()
+      Tab(value: TabSelection.search, role: .search) {
+        SearchTabView()
       }
     }
     .modifier(TabBarMinimizeModifier())

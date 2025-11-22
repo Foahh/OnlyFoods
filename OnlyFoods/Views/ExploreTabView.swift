@@ -13,27 +13,7 @@ struct ExploreTabView: View {
   @Query private var reviews: [ReviewModel]
   @Query private var users: [UserModel]
   @StateObject private var restaurantService = RestaurantService.shared
-  @StateObject private var searchService = SearchService.shared
   @StateObject private var timeService = TimeService.shared
-
-  var filteredRestaurants: [RestaurantModel] {
-    var filtered = restaurantService.restaurants
-
-    if !searchService.searchText.isEmpty {
-      filtered = filtered.filter { restaurant in
-        restaurant.name.localizedCaseInsensitiveContains(searchService.searchText)
-          || restaurant.categories.contains {
-            $0.localizedCaseInsensitiveContains(searchService.searchText)
-          }
-      }
-    }
-
-    if let category = searchService.selectedCategory {
-      filtered = filtered.filter { $0.categories.contains(category) }
-    }
-
-    return filtered
-  }
 
   var body: some View {
     NavigationStack {
@@ -41,15 +21,12 @@ struct ExploreTabView: View {
         if restaurantService.isLoading {
           ProgressView()
             .scaleEffect(1.5)
-        } else if filteredRestaurants.isEmpty {
-          ExploreEmptyStateView(
-            hasActiveFilters: !searchService.searchText.isEmpty
-              || searchService.selectedCategory != nil
-          )
+        } else if restaurantService.restaurants.isEmpty {
+          ExploreEmptyStateView(hasActiveFilters: false)
         } else {
           ScrollView {
             LazyVStack(spacing: 16) {
-              ForEach(filteredRestaurants) { restaurant in
+              ForEach(restaurantService.restaurants) { restaurant in
                 NavigationLink {
                   RestaurantDetailView(restaurant: restaurant)
                 } label: {

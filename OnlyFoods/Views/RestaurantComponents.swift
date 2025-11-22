@@ -8,28 +8,6 @@
 import Foundation
 import SwiftUI
 
-struct ConfirmButton: View {
-  let action: () -> Void
-  var icon: String = "arrow.up"
-  var disabled: Bool = false
-
-  var body: some View {
-    if #available(iOS 26.0, *) {
-      Button(role: .confirm) {
-        action()
-      } label: {
-        Image(systemName: icon)
-      }
-      .disabled(disabled)
-    } else {
-      Button(action: action) {
-        Image(systemName: icon)
-      }
-      .disabled(disabled)
-    }
-  }
-}
-
 struct ImagePlaceholder: View {
   var body: some View {
     ZStack {

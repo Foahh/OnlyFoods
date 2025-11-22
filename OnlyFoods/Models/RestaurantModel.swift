@@ -5,6 +5,7 @@
 //  Created by Foahh on 2025/11/12.
 //
 
+import CoreLocation
 import Foundation
 
 struct RestaurantModel: Codable, Identifiable {
@@ -66,6 +67,11 @@ struct RestaurantModel: Codable, Identifiable {
       return false
     }
     return businessHours.isOpen(at: date)
+  }
+
+  /// Returns the restaurant's location as a CLLocationCoordinate2D
+  var coordinate: CLLocationCoordinate2D {
+    CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
   }
 
 }

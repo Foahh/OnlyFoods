@@ -177,6 +177,7 @@ struct RestaurantDetailView: View {
     .sheet(isPresented: $showAuthView) {
       AuthView()
     }
+    .modifier(TabBarMinimizeModifier())
   }
 }
 
@@ -562,13 +563,13 @@ struct ReviewRowView: View {
   let review: ReviewModel
   let users: [UserModel]
   let currentUser: UserModel?
-  
+
   @State private var showDeleteConfirmation = false
 
   var reviewUser: UserModel? {
     users.first { $0.id == review.userID }
   }
-  
+
   var isOwnReview: Bool {
     currentUser?.id == review.userID
   }
@@ -621,7 +622,7 @@ struct ReviewRowView: View {
                   .font(.caption)
               }
             }
-            
+
             // Delete button (only for own reviews)
             if isOwnReview {
               Button(action: {
@@ -681,7 +682,7 @@ struct ReviewRowView: View {
       Text("Are you sure you want to delete this review? This action cannot be undone.")
     }
   }
-  
+
   private func deleteReview() {
     modelContext.delete(review)
   }

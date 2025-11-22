@@ -4,6 +4,7 @@
 //  Created by Foahh on 2025/11/12.
 //
 
+import CoreLocation
 import MapKit
 import SwiftData
 import SwiftUI
@@ -11,13 +12,9 @@ import SwiftUI
 struct MapTabView: View {
   @Environment(\.modelContext) private var modelContext
   @Query private var reviews: [ReviewModel]
+  @Query private var users: [UserModel]
+  @StateObject private var searchService = SearchService()
   @StateObject private var restaurantService = RestaurantService.shared
-  @StateObject private var searchService = SearchService.shared
-
-  //  private let initialRegion = MKCoordinateRegion(
-  //			center: CLLocationCoordinate2D(latitude: 22.3193, longitude: 114.1694),
-  //			span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02) // smaller = more zoom in
-  //		)
 
   var isTooZoomedOut: Bool {
     guard let region = visibleRegion else { return false }
@@ -28,13 +25,21 @@ struct MapTabView: View {
   @State private var visibleRegion: MKCoordinateRegion?
   @State private var selectedRestaurant: RestaurantModel?
   @State private var cameraPosition: MapCameraPosition = .automatic
+  @State private var showFilterSheet = false
 
   var filteredRestaurants: [RestaurantModel] {
     var filtered = restaurantService.restaurants
 
+    // Apply search service filters
+    filtered = RestaurantFilter.filter(
+      restaurants: filtered,
+      searchService: searchService
+    )
+
+    // Apply map region filter
     if let region = visibleRegion {
       if region.span.latitudeDelta > 0.05 {
-        return []  // 或之後改成顯示「Zoom in to see restaurants」
+        return []
       }
 
       let center = region.center
@@ -51,18 +56,16 @@ struct MapTabView: View {
       }
     }
 
-    if !searchService.searchText.isEmpty {
-      filtered = filtered.filter { restaurant in
-        restaurant.name.localizedCaseInsensitiveContains(searchService.searchText)
-          || restaurant.categories.contains {
-            $0.localizedCaseInsensitiveContains(searchService.searchText)
-          }
-      }
-    }
-
-    if let category = searchService.selectedCategory {
-      filtered = filtered.filter { $0.categories.contains(category) }
-    }
+    // Apply sorting
+    filtered = RestaurantSorter.sort(
+      restaurants: filtered,
+      sortOption: searchService.sortOption,
+      sortDirection: searchService.sortDirection,
+      searchService: searchService,
+      restaurantService: restaurantService,
+      reviews: reviews,
+      users: users
+    )
 
     let maxPins = 50
     if filtered.count > maxPins {
@@ -113,13 +116,6 @@ struct MapTabView: View {
         .onMapCameraChange(frequency: .continuous) { context in
           visibleRegion = context.region
         }
-        .onAppear {
-          if visibleRegion == nil {
-            let region = locationManager.region
-            visibleRegion = region
-            cameraPosition = .region(region)
-          }
-        }
         if isTooZoomedOut {
           VStack {
             Text("Please zoom in to view restaurants")
@@ -134,10 +130,45 @@ struct MapTabView: View {
         }
       }
       .navigationTitle("Map")
+      .overlay(alignment: .bottom) {
+        FilterFloatingButton(
+          restaurantCount: filteredRestaurants.count,
+          hasActiveFilters: searchService.hasActiveFilters,
+          action: { showFilterSheet = true }
+        )
+      }
+      .sheet(isPresented: $showFilterSheet) {
+        FilterSheet(
+          searchService: searchService,
+          restaurantService: restaurantService
+        )
+      }
       .sheet(item: $selectedRestaurant) { restaurant in
         RestaurantDetailView(restaurant: restaurant)
       }
+      .onAppear {
+        if visibleRegion == nil {
+          let region = locationManager.region
+          visibleRegion = region
+          cameraPosition = .region(region)
+        }
+        updateUserLocation()
+      }
+      .onChange(of: locationManager.region.center.latitude) { _, _ in
+        updateUserLocation()
+      }
+      .onChange(of: locationManager.region.center.longitude) { _, _ in
+        updateUserLocation()
+      }
     }
+  }
+
+  private func updateUserLocation() {
+    let center = locationManager.region.center
+    searchService.userLocation = CLLocation(
+      latitude: center.latitude,
+      longitude: center.longitude
+    )
   }
 }
 
