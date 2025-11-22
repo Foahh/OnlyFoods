@@ -514,9 +514,7 @@ struct RestaurantDetailReviewsSection: View {
     ) {
       VStack(alignment: .leading, spacing: 16) {
         if reviews.isEmpty {
-          RestaurantDetailEmptyReviewsState(
-            hasCurrentUser: currentUser != nil
-          )
+          RestaurantDetailEmptyReviewsState()
         } else {
           LazyVStack(spacing: 16) {
             ForEach(reviews) { review in
@@ -534,8 +532,6 @@ struct RestaurantDetailReviewsSection: View {
 }
 
 struct RestaurantDetailEmptyReviewsState: View {
-  let hasCurrentUser: Bool
-
   var body: some View {
     VStack(spacing: 12) {
       Image(systemName: "star.bubble")
@@ -544,12 +540,10 @@ struct RestaurantDetailEmptyReviewsState: View {
       Text("No reviews yet")
         .font(.headline)
         .foregroundStyle(.primary)
-      if hasCurrentUser {
-        Text("Be the first to review this restaurant!")
-          .font(.subheadline)
-          .foregroundStyle(.secondary)
-          .multilineTextAlignment(.center)
-      }
+      Text("Be the first to review this restaurant!")
+        .font(.subheadline)
+        .foregroundStyle(.secondary)
+        .multilineTextAlignment(.center)
     }
     .frame(maxWidth: .infinity)
     .padding(.vertical, 32)
