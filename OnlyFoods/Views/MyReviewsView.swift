@@ -25,19 +25,29 @@ struct MyReviewsView: View {
   }
 
   var body: some View {
-    ScrollView {
-      if userReviews.isEmpty {
+    if userReviews.isEmpty {
+      ScrollView {
         EmptyReviewsView()
-      } else {
-        ReviewListContent(
-          reviews: userReviews,
-          restaurantService: restaurantService
-        )
+          .padding(.top, 8)
       }
+      .navigationTitle("My Reviews")
+      .navigationBarTitleDisplayMode(.large)
+      .background(Color(.systemGroupedBackground))
+    } else {
+      List {
+        ForEach(userReviews) { review in
+          ReviewNavigationLink(
+            review: review,
+            restaurantService: restaurantService,
+            modelContext: modelContext
+          )
+        }
+      }
+      .listStyle(.insetGrouped)
+      .padding(.top, 8)
+      .navigationTitle("My Reviews")
+      .navigationBarTitleDisplayMode(.large)
     }
-    .navigationTitle("My Reviews")
-    .navigationBarTitleDisplayMode(.large)
-    .background(Color(.systemGroupedBackground))
   }
 }
 
@@ -50,27 +60,11 @@ struct EmptyReviewsView: View {
     )
   }
 }
-struct ReviewListContent: View {
-  let reviews: [ReviewModel]
-  let restaurantService: RestaurantService
-
-  var body: some View {
-    LazyVStack(spacing: 16) {
-      ForEach(reviews) { review in
-        ReviewNavigationLink(
-          review: review,
-          restaurantService: restaurantService
-        )
-      }
-    }
-    .padding(.horizontal, 16)
-    .padding(.vertical, 8)
-  }
-}
 
 struct ReviewNavigationLink: View {
   let review: ReviewModel
   let restaurantService: RestaurantService
+  let modelContext: ModelContext
 
   var body: some View {
     NavigationLink {
@@ -88,7 +82,18 @@ struct ReviewNavigationLink: View {
         restaurants: restaurantService.restaurants
       )
     }
-    .buttonStyle(.plain)
+    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+      Button(role: .destructive) {
+        deleteReview()
+      } label: {
+        Label("Delete", systemImage: "trash")
+      }
+    }
+  }
+
+  private func deleteReview() {
+    modelContext.delete(review)
+    try? modelContext.save()
   }
 }
 
@@ -101,7 +106,7 @@ struct UserReviewRow: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 12) {
+    VStack(alignment: .leading, spacing: 8) {
       if let restaurant = restaurant {
         RestaurantHeaderView(restaurantName: restaurant.name)
       }
@@ -118,15 +123,7 @@ struct UserReviewRow: View {
 
       ReviewTimestampView(timestamp: review.timestamp)
     }
-    .padding(16)
-    .frame(maxWidth: .infinity, alignment: .leading)
-    .background(Color(.systemBackground))
-    .cornerRadius(16)
-    .overlay(
-      RoundedRectangle(cornerRadius: 16)
-        .stroke(Color(.separator), lineWidth: 0.5)
-    )
-    .shadow(color: Color.black.opacity(0.04), radius: 4, x: 0, y: 2)
+    .padding(.vertical, 4)
   }
 }
 
@@ -142,9 +139,6 @@ struct RestaurantHeaderView: View {
         .font(.headline)
         .foregroundStyle(.primary)
       Spacer()
-      Image(systemName: "chevron.right")
-        .font(.caption)
-        .foregroundStyle(.secondary.opacity(0.5))
     }
   }
 }

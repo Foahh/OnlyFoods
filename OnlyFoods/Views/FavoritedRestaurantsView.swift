@@ -24,19 +24,42 @@ struct FavoritedRestaurantsView: View {
   }
 
   var body: some View {
-    ScrollView {
-      if favoriteRestaurants.isEmpty {
+    if favoriteRestaurants.isEmpty {
+      ScrollView {
         FavoritedRestaurantsEmptyState()
-      } else {
-        FavoriteRestaurantsList(
-          restaurants: favoriteRestaurants,
-          reviews: reviews
-        )
+          .padding(.top, 8)
       }
+      .navigationTitle("Favorited Restaurants")
+      .navigationBarTitleDisplayMode(.large)
+      .background(Color(.systemGroupedBackground))
+    } else {
+      List {
+        ForEach(favoriteRestaurants) { restaurant in
+          NavigationLink {
+            RestaurantDetailView(restaurant: restaurant)
+          } label: {
+            FavoritedRestaurantRow(restaurant: restaurant, reviews: reviews)
+          }
+          .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            Button(role: .destructive) {
+              removeFavorite(restaurantID: restaurant.id)
+            } label: {
+              Label("Unfavorite", systemImage: "heart.slash")
+            }
+          }
+        }
+      }
+      .listStyle(.insetGrouped)
+      .padding(.top, 8)
+      .navigationTitle("Favorited Restaurants")
+      .navigationBarTitleDisplayMode(.large)
     }
-    .navigationTitle("Favorited Restaurants")
-    .navigationBarTitleDisplayMode(.large)
-    .background(Color(.systemGroupedBackground))
+  }
+
+  private func removeFavorite(restaurantID: String) {
+    guard let user = currentUser else { return }
+    user.removeFavorite(restaurantID: restaurantID)
+    try? modelContext.save()
   }
 }
 
@@ -50,26 +73,6 @@ struct FavoritedRestaurantsEmptyState: View {
   }
 }
 
-struct FavoriteRestaurantsList: View {
-  let restaurants: [RestaurantModel]
-  let reviews: [ReviewModel]
-
-  var body: some View {
-    LazyVStack(spacing: 16) {
-      ForEach(restaurants) { restaurant in
-        NavigationLink {
-          RestaurantDetailView(restaurant: restaurant)
-        } label: {
-          FavoritedRestaurantRow(restaurant: restaurant, reviews: reviews)
-        }
-        .buttonStyle(.plain)
-      }
-    }
-    .padding(.horizontal, 16)
-    .padding(.vertical, 8)
-  }
-}
-
 struct FavoritedRestaurantRow: View {
   let restaurant: RestaurantModel
   let reviews: [ReviewModel]
@@ -79,23 +82,12 @@ struct FavoritedRestaurantRow: View {
   }
 
   var body: some View {
-    HStack(spacing: 16) {
-      RestaurantThumbnailView(restaurant: restaurant)
+    HStack(spacing: 12) {
+      RestaurantThumbnailView(restaurant: restaurant, size: 60, cornerRadius: 8)
 
       RestaurantInfoView(restaurant: restaurant, rating: rating)
-
-      Image(systemName: "chevron.right")
-        .font(.caption)
-        .foregroundStyle(.secondary.opacity(0.5))
     }
-    .padding(16)
-    .background(Color(.systemBackground))
-    .cornerRadius(16)
-    .overlay(
-      RoundedRectangle(cornerRadius: 16)
-        .stroke(Color(.separator), lineWidth: 0.5)
-    )
-    .shadow(color: Color.black.opacity(0.04), radius: 4, x: 0, y: 2)
+    .padding(.vertical, 4)
   }
 }
 

@@ -519,7 +519,11 @@ struct RestaurantDetailReviewsSection: View {
         } else {
           LazyVStack(spacing: 16) {
             ForEach(reviews) { review in
-              ReviewRowView(review: review, users: users)
+              ReviewRowView(
+                review: review,
+                users: users,
+                currentUser: currentUser
+              )
             }
           }
         }
@@ -554,11 +558,19 @@ struct RestaurantDetailEmptyReviewsState: View {
 }
 
 struct ReviewRowView: View {
+  @Environment(\.modelContext) private var modelContext
   let review: ReviewModel
   let users: [UserModel]
+  let currentUser: UserModel?
+  
+  @State private var showDeleteConfirmation = false
 
   var reviewUser: UserModel? {
     users.first { $0.id == review.userID }
+  }
+  
+  var isOwnReview: Bool {
+    currentUser?.id == review.userID
   }
 
   var body: some View {
@@ -609,6 +621,18 @@ struct ReviewRowView: View {
                   .font(.caption)
               }
             }
+            
+            // Delete button (only for own reviews)
+            if isOwnReview {
+              Button(action: {
+                showDeleteConfirmation = true
+              }) {
+                Image(systemName: "trash")
+                  .font(.caption)
+                  .foregroundStyle(.red)
+                  .padding(6)
+              }
+            }
           }
 
           Text(review.timestamp, style: .relative)
@@ -644,6 +668,22 @@ struct ReviewRowView: View {
         .stroke(Color(.separator), lineWidth: 0.5)
     )
     .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+    .confirmationDialog(
+      "Delete Review",
+      isPresented: $showDeleteConfirmation,
+      titleVisibility: .visible
+    ) {
+      Button(role: .destructive, action: deleteReview) {
+        Text("Delete")
+      }
+      Button("Cancel", role: .cancel) {}
+    } message: {
+      Text("Are you sure you want to delete this review? This action cannot be undone.")
+    }
+  }
+  
+  private func deleteReview() {
+    modelContext.delete(review)
   }
 }
 
