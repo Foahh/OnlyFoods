@@ -38,7 +38,7 @@ struct ContentView: View {
       }
 
       Tab(value: 3, role: .search) {
-        SearchView()
+        ExploreTabView()
       }
     }
     .modifier(TabBarMinimizeModifier())

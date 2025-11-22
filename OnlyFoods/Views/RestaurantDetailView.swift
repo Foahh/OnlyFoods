@@ -20,8 +20,7 @@ struct RestaurantDetailView: View {
   @State private var showAddReview = false
   @State private var currentRestaurant: RestaurantModel
   @State private var showAuthView = false
-	
-	
+
   private var currentUser: UserModel? {
     userManager.currentUser
   }
@@ -86,20 +85,20 @@ struct RestaurantDetailView: View {
             isFavorite: currentUser?.isFavorite(restaurantID: currentRestaurant.id) ?? false,
             favoriteCount: favoriteCount,
             visitedCount: visitedCount,
-			onToggleVisited: {
-				   if let user = currentUser {
-					   toggleVisitedState()
-				   } else {
-					   showAuthView = true
-				   }
-			   },
-		   onToggleFavorite: {
-			   if let user = currentUser {
-				   toggleFavoriteState()
-			   } else {
-				   showAuthView = true
-			   }
-		   }
+            onToggleVisited: {
+              if let user = currentUser {
+                toggleVisitedState()
+              } else {
+                showAuthView = true
+              }
+            },
+            onToggleFavorite: {
+              if let user = currentUser {
+                toggleFavoriteState()
+              } else {
+                showAuthView = true
+              }
+            }
           )
 
           if !currentRestaurant.categories.isEmpty || priceText != nil {
@@ -120,13 +119,13 @@ struct RestaurantDetailView: View {
             reviews: restaurantReviews,
             users: users,
             currentUser: currentUser,
-			onAddReview: {
-				if let user = currentUser {
-					showAddReview = true
-				} else {
-					showAuthView = true
-				}
-			}
+            onAddReview: {
+              if let user = currentUser {
+                showAddReview = true
+              } else {
+                showAuthView = true
+              }
+            }
           )
 
           RestaurantDetailLocationContactSection(
@@ -173,9 +172,9 @@ struct RestaurantDetailView: View {
         PostReviewView(restaurant: currentRestaurant, user: user)
       }
     }
-	.sheet(isPresented: $showAuthView) {
-	  AuthView()
-	}
+    .sheet(isPresented: $showAuthView) {
+      AuthView()
+    }
   }
 }
 
@@ -222,25 +221,24 @@ struct RestaurantDetailHeaderSection: View {
 
         RatingView(rating: rating)
       }
-      
-		HStack(spacing: 12) {
-		  RestaurantDetailActionButton(
-			title: "Visited",
-			systemImage: hasVisited ? "checkmark.circle.fill" : "checkmark.circle",
-			isFilled: hasVisited,
-			activeColor: .blue,
-			onTap: onToggleVisited
-		  )
 
-		  RestaurantDetailActionButton(
-			title: "Favorite",
-			systemImage: isFavorite ? "heart.fill" : "heart",
-			isFilled: isFavorite,
-			activeColor: .red,
-			onTap: onToggleFavorite
-		  )
-	}
-      
+      HStack(spacing: 12) {
+        RestaurantDetailActionButton(
+          title: "Visited",
+          systemImage: hasVisited ? "checkmark.circle.fill" : "checkmark.circle",
+          isFilled: hasVisited,
+          activeColor: .blue,
+          onTap: onToggleVisited
+        )
+
+        RestaurantDetailActionButton(
+          title: "Favorite",
+          systemImage: isFavorite ? "heart.fill" : "heart",
+          isFilled: isFavorite,
+          activeColor: .red,
+          onTap: onToggleFavorite
+        )
+      }
 
       RestaurantDetailSocialStatsView(
         favoriteCount: favoriteCount,
@@ -415,7 +413,7 @@ struct RestaurantDetailLocationContactSection: View {
     ) {
       VStack(alignment: .leading, spacing: 16) {
         VStack(alignment: .leading, spacing: 12) {
-			
+
           if hasAddress, let address {
             InfoRow(
               icon: "mappin.and.ellipse",
@@ -499,16 +497,16 @@ struct RestaurantDetailReviewsSection: View {
       icon: "text.bubble.fill",
       accentColor: .indigo,
       headerTrailing: {
-          Button(action: onAddReview) {
-            Label("Post", systemImage: "plus.circle.fill")
-              .font(.subheadline.weight(.semibold))
-              .padding(.horizontal, 12)
-              .padding(.vertical, 8)
-              .background(Color.blue.opacity(0.12))
-              .foregroundStyle(.blue)
-              .clipShape(Capsule())
-          }
-        
+        Button(action: onAddReview) {
+          Label("Post", systemImage: "plus.circle.fill")
+            .font(.subheadline.weight(.semibold))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Color.blue.opacity(0.12))
+            .foregroundStyle(.blue)
+            .clipShape(Capsule())
+        }
+
       }
     ) {
       VStack(alignment: .leading, spacing: 16) {
