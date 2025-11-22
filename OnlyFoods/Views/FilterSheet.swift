@@ -41,6 +41,8 @@ struct FilterFloatingButton: View {
 struct FilterSheet: View {
   @ObservedObject var searchService: SearchService
   @ObservedObject var restaurantService: RestaurantService
+  var showSortSection: Bool = true
+  var showDistanceSection: Bool = true
   @Environment(\.dismiss) private var dismiss
 
   var availableCategories: [String] {
@@ -71,8 +73,12 @@ struct FilterSheet: View {
   var body: some View {
     NavigationStack {
       Form {
-        SortSection(searchService: searchService)
-        DistanceFilterSection(searchService: searchService)
+        if showSortSection {
+          SortSection(searchService: searchService)
+        }
+        if showDistanceSection {
+          DistanceFilterSection(searchService: searchService)
+        }
         CategoriesSection(
           categories: availableCategories,
           selectedCategories: $searchService.selectedCategories,
@@ -361,7 +367,7 @@ struct FilterSearchBar: View {
     .padding(.horizontal, 12)
     .padding(.vertical, 8)
     .background(Color(.systemGray6))
-    .cornerRadius(10)
+    .cornerRadius(16)
   }
 }
 

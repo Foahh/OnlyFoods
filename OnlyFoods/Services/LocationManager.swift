@@ -21,6 +21,7 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     super.init()
     locationManager.delegate = self
     locationManager.requestWhenInUseAuthorization()
+    locationManager.distanceFilter = kCLLocationAccuracyBest
   }
 
   func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
