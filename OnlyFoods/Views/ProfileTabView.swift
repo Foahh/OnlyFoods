@@ -54,6 +54,8 @@ struct ProfileTabView: View {
           .padding(.top, 8)
         }
         .background(Color(.systemGroupedBackground))
+        .navigationTitle("Profile")
+        .navigationBarTitleDisplayMode(.inline)
       } else {
         ProfileEmptyStateView(showAuthView: $showAuthView)
       }
@@ -69,13 +71,7 @@ struct ProfileHeaderView: View {
     VStack(spacing: 16) {
       ZStack {
         Circle()
-          .fill(
-            LinearGradient(
-              colors: [Color.blue.opacity(0.2), Color.purple.opacity(0.1)],
-              startPoint: .topLeading,
-              endPoint: .bottomTrailing
-            )
-          )
+          .fill(Color.blue.opacity(0.2))
           .frame(width: 120, height: 120)
 
         if let avatar = user.avatar {
@@ -118,10 +114,6 @@ struct ProfileHeaderView: View {
           .font(.title)
           .fontWeight(.bold)
           .foregroundStyle(.primary)
-
-        Text("\(reviewCount) review\(reviewCount == 1 ? "" : "s")")
-          .font(.subheadline)
-          .foregroundStyle(.secondary)
       }
     }
     .padding(.top, 8)
@@ -213,6 +205,26 @@ struct ProfileEmptyStateView: View {
       Spacer()
 
       VStack(spacing: 20) {
+        ZStack {
+          Circle()
+            .fill(Color.blue.opacity(0.2))
+            .frame(width: 120, height: 120)
+
+          Circle()
+            .fill(Color.blue.opacity(0.1))
+            .frame(width: 110, height: 110)
+            .overlay {
+              Image(systemName: "person.fill")
+                .font(.system(size: 50))
+                .foregroundColor(.blue)
+            }
+            .overlay(
+              Circle()
+                .stroke(Color.white, lineWidth: 3)
+            )
+        }
+        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+
         VStack(spacing: 8) {
           Text("Welcome to OnlyFoods")
             .font(.title2)
@@ -255,6 +267,7 @@ struct ProfileEmptyStateView: View {
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color(.systemGroupedBackground))
     .navigationTitle("Profile")
+    .navigationBarTitleDisplayMode(.inline)
     .sheet(isPresented: $showAuthView) {
       AuthView()
     }
