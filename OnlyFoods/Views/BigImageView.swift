@@ -1,5 +1,5 @@
 //
-//  FullScreenImageView.swift
+//  BigImageView.swift
 //  OnlyFoods
 //
 //  Created by Foahh on 2025/11/21.
@@ -7,14 +7,14 @@
 
 import SwiftUI
 
-struct FullScreenImageView<Placeholder: View>: View {
+struct BigImageView<Placeholder: View>: View {
   @Environment(\.dismiss) private var dismiss
   let imageSource: String
   private let placeholder: () -> Placeholder
 
   init(
     imageSource: String,
-    @ViewBuilder placeholder: @escaping () -> Placeholder = { DefaultFullScreenImagePlaceholder() }
+    @ViewBuilder placeholder: @escaping () -> Placeholder = { DefaultBigImagePlaceholder() }
   ) {
     self.imageSource = imageSource
     self.placeholder = placeholder
@@ -24,7 +24,7 @@ struct FullScreenImageView<Placeholder: View>: View {
     ZStack {
       Color.black.ignoresSafeArea()
 
-      fullScreenContent
+      BigContent
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
 
@@ -53,7 +53,7 @@ struct FullScreenImageView<Placeholder: View>: View {
   }
 
   @ViewBuilder
-  private var fullScreenContent: some View {
+  private var BigContent: some View {
     if let url = URL(string: imageSource), url.scheme != nil {
       AsyncImage(url: url) { phase in
         switch phase {
@@ -90,7 +90,7 @@ struct FullScreenImageView<Placeholder: View>: View {
   }
 }
 
-private struct DefaultFullScreenImagePlaceholder: View {
+private struct DefaultBigImagePlaceholder: View {
   var body: some View {
     RoundedRectangle(cornerRadius: 12)
       .fill(Color(.systemGray4))
@@ -104,7 +104,7 @@ private struct DefaultFullScreenImagePlaceholder: View {
 }
 
 #Preview {
-  FullScreenImageView(
+  BigImageView(
     imageSource: "https://picsum.photos/800/1200"
   )
 }

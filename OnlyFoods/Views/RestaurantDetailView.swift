@@ -1026,7 +1026,7 @@ struct RestaurantImageItem: View {
       isPresentingFullScreen = true
     }
     .fullScreenCover(isPresented: $isPresentingFullScreen) {
-      FullScreenImageView(imageSource: url.absoluteString) {
+      BigImageView(imageSource: url.absoluteString) {
         ImagePlaceholder()
           .frame(width: 200, height: 200)
       }
@@ -1059,7 +1059,7 @@ struct ReviewImageView: View {
         isPresentingFullScreen = true
       }
       .fullScreenCover(isPresented: $isPresentingFullScreen) {
-        FullScreenImageView(imageSource: imageSource) {
+        BigImageView(imageSource: imageSource) {
           ReviewImagePlaceholder()
             .frame(width: 200, height: 200)
         }
