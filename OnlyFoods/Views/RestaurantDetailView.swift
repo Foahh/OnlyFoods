@@ -73,6 +73,14 @@ struct RestaurantDetailView: View {
     return URL(string: "tel://\(sanitized)")
   }
 
+  private func requireAuthentication(perform action: @escaping () -> Void) {
+    if currentUser != nil {
+      action()
+    } else {
+      showAuthView = true
+    }
+  }
+
   var body: some View {
     ScrollView {
       VStack {
@@ -86,17 +94,13 @@ struct RestaurantDetailView: View {
             favoriteCount: favoriteCount,
             visitedCount: visitedCount,
             onToggleVisited: {
-              if let user = currentUser {
+              requireAuthentication {
                 toggleVisitedState()
-              } else {
-                showAuthView = true
               }
             },
             onToggleFavorite: {
-              if let user = currentUser {
+              requireAuthentication {
                 toggleFavoriteState()
-              } else {
-                showAuthView = true
               }
             }
           )
@@ -120,10 +124,8 @@ struct RestaurantDetailView: View {
             users: users,
             currentUser: currentUser,
             onAddReview: {
-              if let user = currentUser {
+              requireAuthentication {
                 showAddReview = true
-              } else {
-                showAuthView = true
               }
             }
           )
