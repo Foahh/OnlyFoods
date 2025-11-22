@@ -19,6 +19,8 @@ struct SearchTabView: View {
   @StateObject private var timeService = TimeService.shared
   @State private var locationManager = LocationManager()
   @State private var showFilterSheet = false
+  @State private var keyboardHeight: CGFloat = 0
+  @State private var keyboardObservers: [NSObjectProtocol] = []
 
   var foundRestaurants: [RestaurantModel] {
     guard searchService.hasActiveSearch else {
@@ -65,13 +67,15 @@ struct SearchTabView: View {
       .navigationTitle("Search")
       .navigationBarTitleDisplayMode(.large)
       .searchable(text: $searchService.searchText, prompt: "Search restaurants...")
-      // It not recommended to use liquid glass button by apple here, since this element is layered below the TabBar.
       .overlay(alignment: .bottom) {
         FilterFloatingButton(
           restaurantCount: restaurantCount,
           hasActiveFilters: searchService.hasActiveFilters,
           action: { showFilterSheet = true }
         )
+        .padding(.bottom, 20)
+        .offset(y: -keyboardHeight)
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: keyboardHeight)
       }
       .sheet(isPresented: $showFilterSheet) {
         FilterSheet(
@@ -81,6 +85,10 @@ struct SearchTabView: View {
       }
       .onAppear {
         updateUserLocation()
+        setupKeyboardObservers()
+      }
+      .onDisappear {
+        removeKeyboardObservers()
       }
       .onChange(of: locationManager.region.center.latitude) { _, _ in
         updateUserLocation()
@@ -97,6 +105,37 @@ struct SearchTabView: View {
       latitude: center.latitude,
       longitude: center.longitude
     )
+  }
+
+  private func setupKeyboardObservers() {
+    let showObserver = NotificationCenter.default.addObserver(
+      forName: UIResponder.keyboardWillShowNotification,
+      object: nil,
+      queue: .main
+    ) { notification in
+      if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey]
+        as? CGRect
+      {
+        keyboardHeight = keyboardFrame.height
+      }
+    }
+
+    let hideObserver = NotificationCenter.default.addObserver(
+      forName: UIResponder.keyboardWillHideNotification,
+      object: nil,
+      queue: .main
+    ) { _ in
+      keyboardHeight = 0
+    }
+
+    keyboardObservers = [showObserver, hideObserver]
+  }
+
+  private func removeKeyboardObservers() {
+    keyboardObservers.forEach { observer in
+      NotificationCenter.default.removeObserver(observer)
+    }
+    keyboardObservers = []
   }
 }
 

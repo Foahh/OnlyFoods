@@ -33,44 +33,8 @@ struct FilterFloatingButton: View {
       )
       .padding(.horizontal, 16)
       .padding(.vertical, 12)
-      .background(
-        Capsule()
-          .fill(
-            hasActiveFilters
-              ? Color.accentColor
-              : Color(.systemBackground)
-          )
-          .overlay(
-            Capsule()
-              .stroke(
-                hasActiveFilters
-                  ? Color.accentColor.opacity(0.5)
-                  : Color(.separator),
-                lineWidth: hasActiveFilters ? 1.5 : 0.5
-              )
-          )
-      )
-      .shadow(
-        color: hasActiveFilters
-          ? Color.accentColor.opacity(0.2)
-          : Color.black.opacity(0.1),
-        radius: hasActiveFilters ? 8 : 6,
-        x: 0,
-        y: hasActiveFilters ? 4 : 2
-      )
     }
-    .buttonStyle(FilterButtonStyle())
-    .padding(.horizontal, 20)
-    .padding(.bottom, 20)
-    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: hasActiveFilters)
-  }
-}
-
-struct FilterButtonStyle: ButtonStyle {
-  func makeBody(configuration: Configuration) -> some View {
-    configuration.label
-      .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
-      .animation(.spring(response: 0.2, dampingFraction: 0.6), value: configuration.isPressed)
+    .modifier(GlassEffectInteractiveModifier())
   }
 }
 
