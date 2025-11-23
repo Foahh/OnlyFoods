@@ -21,6 +21,7 @@ struct RestaurantDetailView: View {
   @State private var showAddReview = false
   @State private var currentRestaurant: RestaurantModel
   @State private var showAuthView = false
+  @State private var showMapView = false
   @State private var locationManager = LocationManager()
 
   private var currentUser: UserModel? {
@@ -162,12 +163,11 @@ struct RestaurantDetailView: View {
           )
 
           RestaurantDetailLocationContactSection(
-            latitude: currentRestaurant.latitude,
-            longitude: currentRestaurant.longitude,
-            restaurantName: currentRestaurant.name,
-            address: currentRestaurant.addressString,
-            phone: currentRestaurant.contactPhone,
-            phoneURL: currentRestaurant.contactPhone.flatMap { phoneURL(for: $0) }
+            restaurant: currentRestaurant,
+            phoneURL: currentRestaurant.contactPhone.flatMap { phoneURL(for: $0) },
+            onShowMap: {
+              showMapView = true
+            }
           )
 
           if let services = currentRestaurant.services, !services.isEmpty {
@@ -207,6 +207,9 @@ struct RestaurantDetailView: View {
     }
     .sheet(isPresented: $showAuthView) {
       AuthView()
+    }
+    .sheet(isPresented: $showMapView) {
+      RestaurantMapView(restaurant: currentRestaurant)
     }
     .modifier(TabBarMinimizeModifier())
   }
@@ -462,24 +465,21 @@ struct RestaurantDetailPhotosSection: View {
 }
 
 struct RestaurantDetailLocationContactSection: View {
-  let latitude: Double
-  let longitude: Double
-  let restaurantName: String
-  let address: String?
-  let phone: String?
+  let restaurant: RestaurantModel
   let phoneURL: URL?
+  let onShowMap: () -> Void
 
   private var hasAddress: Bool {
-    address?.isEmpty == false
+    restaurant.addressString?.isEmpty == false
   }
 
   private var hasPhone: Bool {
-    phone?.isEmpty == false && phoneURL != nil
+    restaurant.contactPhone?.isEmpty == false && phoneURL != nil
   }
 
   private var coordinateText: String {
-    let lat = String(format: "%.4f", latitude)
-    let lon = String(format: "%.4f", longitude)
+    let lat = String(format: "%.4f", restaurant.latitude)
+    let lon = String(format: "%.4f", restaurant.longitude)
     return "\(lat), \(lon)"
   }
 
@@ -492,20 +492,13 @@ struct RestaurantDetailLocationContactSection: View {
       VStack(alignment: .leading, spacing: 16) {
         VStack(alignment: .leading, spacing: 12) {
 
-          if hasAddress, let address {
+          if hasAddress, let address = restaurant.addressString {
             InfoRow(
               icon: "mappin.and.ellipse",
               title: "Address",
               detail: address,
               trailing: {
-                Button(action: {
-                  let mapItem = MKMapItem(
-                    placemark: MKPlacemark(
-                      coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-                    ))
-                  mapItem.name = restaurantName
-                  mapItem.openInMaps()
-                }) {
+                Button(action: onShowMap) {
                   Image(systemName: "location.fill")
                     .font(.headline)
                     .padding(10)
@@ -517,7 +510,7 @@ struct RestaurantDetailLocationContactSection: View {
             )
           }
 
-          if hasPhone, let phone,
+          if hasPhone, let phone = restaurant.contactPhone,
             let phoneURL
           {
             Divider()
