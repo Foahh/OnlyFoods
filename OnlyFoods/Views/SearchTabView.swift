@@ -71,7 +71,7 @@ struct SearchTabView: View {
         FilterFloatingButton(
           isMap: false,
           restaurantCount: restaurantCount,
-          hasActiveFilters: searchService.hasActiveFilters,
+          hasActiveSearch: searchService.hasActiveSearch,
           action: { showFilterSheet = true }
         )
         .padding(.bottom, 20)
@@ -117,7 +117,7 @@ struct SearchTabView: View {
       if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey]
         as? CGRect
       {
-        keyboardHeight = keyboardFrame.height
+        keyboardHeight = keyboardFrame.height / 5
       }
     }
 

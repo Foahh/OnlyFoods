@@ -5,11 +5,11 @@
 //  Created by Foahh on 2025/11/12.
 //
 
+import CoreLocation
 import MapKit
 import SwiftData
 import SwiftUI
 import UIKit
-import CoreLocation
 
 struct RestaurantDetailView: View {
   @Environment(\.modelContext) private var modelContext
@@ -277,7 +277,7 @@ struct RestaurantDetailHeaderSection: View {
             onTap: onToggleFavorite
           )
         }
-        
+
         if !isNearby {
           HStack(spacing: 6) {
             Image(systemName: "location.slash")

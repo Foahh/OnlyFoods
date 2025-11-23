@@ -11,7 +11,7 @@ import SwiftUI
 struct FilterFloatingButton: View {
   let isMap: Bool
   let restaurantCount: Int
-  let hasActiveFilters: Bool
+  let hasActiveSearch: Bool
   let action: () -> Void
 
   var body: some View {
@@ -19,10 +19,9 @@ struct FilterFloatingButton: View {
       HStack(spacing: 8) {
         Image(systemName: "line.3.horizontal.decrease.circle.fill")
           .font(.system(size: 18, weight: .semibold))
-          .symbolEffect(.bounce, value: hasActiveFilters)
 
-        if restaurantCount > 0 {
-          Text("\(restaurantCount)" + (isMap ? "Shown" : "Found"))
+        if hasActiveSearch || restaurantCount > 0 {
+          Text("\(restaurantCount) " + (isMap ? "Shown" : "Found"))
             .font(.system(size: 16, weight: .bold))
         } else {
           Text("Filters")
@@ -30,12 +29,12 @@ struct FilterFloatingButton: View {
         }
       }
       .foregroundStyle(
-        hasActiveFilters ? Color.white : Color.primary
+        hasActiveSearch ? Color.white : Color.primary
       )
       .padding(.horizontal, 16)
       .padding(.vertical, 12)
     }
-    .modifier(GlassEffectInteractiveModifier())
+    .modifier(GlassEffectInteractiveModifier(tint: hasActiveSearch ? .accentColor : nil))
   }
 }
 
@@ -104,7 +103,7 @@ struct FilterSheet: View {
           Button(role: .destructive) {
             searchService.clearFilters()
           } label: {
-            Image(systemName: "xmark.circle")
+            Image(systemName: "xmark")
           }
           .accessibilityLabel("Clear Filters")
           .disabled(!searchService.hasActiveFilters)

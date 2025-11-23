@@ -42,7 +42,7 @@ struct BigImageView<Placeholder: View>: View {
                 .foregroundStyle(.white)
             }
           }
-          .modifier(GlassEffectModifier())
+          .modifier(GlassEffectInteractiveModifier(tint: nil))
           .padding(.top, 8)
           .padding(.trailing, 8)
           .accessibilityLabel("Close")

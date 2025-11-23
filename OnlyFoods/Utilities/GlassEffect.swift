@@ -7,20 +7,11 @@
 
 import SwiftUI
 
-struct GlassEffectModifier: ViewModifier {
-  func body(content: Content) -> some View {
-    if #available(iOS 26.0, *) {
-      content.glassEffect(.regular)
-    } else {
-      content
-    }
-  }
-}
-
 struct GlassEffectInteractiveModifier: ViewModifier {
+  let tint: Color?
   func body(content: Content) -> some View {
     if #available(iOS 26.0, *) {
-      content.glassEffect(.regular.interactive())
+      content.glassEffect(.regular.interactive().tint(tint))
     } else {
       content
     }

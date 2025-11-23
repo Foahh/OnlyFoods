@@ -49,7 +49,7 @@ struct MapTabView: View {
         FilterFloatingButton(
           isMap: true,
           restaurantCount: filteredRestaurants.count,
-          hasActiveFilters: searchService.hasActiveFilters,
+          hasActiveSearch: searchService.hasActiveSearch,
           action: { showFilterSheet = true }
         ).padding(.bottom, 20)
       }
