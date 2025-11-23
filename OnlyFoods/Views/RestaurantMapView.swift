@@ -52,7 +52,7 @@ struct RestaurantMapView: View {
         }
       }
       .overlay(alignment: showLookAround ? .top : .bottom) {
-        MapBottomToolbar(
+        MapFloatingToolbar(
           restaurant: restaurant,
           cameraPosition: $cameraPosition,
           locationManager: locationManager,
@@ -175,7 +175,7 @@ struct RestaurantMapPinView: View {
 }
 
 // https://www.youtube.com/watch?v=4RWJlgimoc8
-struct MapBottomToolbar: View {
+struct MapFloatingToolbar: View {
   let restaurant: RestaurantModel
   @Binding var cameraPosition: MapCameraPosition
   let locationManager: LocationManager
