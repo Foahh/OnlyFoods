@@ -1,5 +1,5 @@
 //
-//  ImagePicker.swift
+//  ImagePickerGallery.swift
 //  OnlyFoods
 //
 //  Created by MJIMI_TK8 on 20/11/2025.
@@ -8,21 +8,21 @@
 import Foundation
 import SwiftUI
 
-struct ImagePicker: UIViewControllerRepresentable {
+struct ImagePickerGallery: UIViewControllerRepresentable {
 
-  var selectedSource: UIImagePickerController.SourceType
   @Environment(\.dismiss) private var dismiss
   @Binding var image: UIImage?
 
   func makeUIViewController(context: Context) -> UIImagePickerController {
     let picker = UIImagePickerController()
-    picker.sourceType = selectedSource
+    picker.sourceType = .photoLibrary
     picker.delegate = context.coordinator
+    picker.mediaTypes = ["public.image"]
     return picker
   }
 
   func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {
-
+    uiViewController.sourceType = .photoLibrary
   }
 
   func makeCoordinator() -> Coordinator {
@@ -30,8 +30,8 @@ struct ImagePicker: UIViewControllerRepresentable {
   }
 
   class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-    let parent: ImagePicker
-    init(parent: ImagePicker) {
+    let parent: ImagePickerGallery
+    init(parent: ImagePickerGallery) {
       self.parent = parent
     }
 
@@ -50,3 +50,4 @@ struct ImagePicker: UIViewControllerRepresentable {
     }
   }
 }
+

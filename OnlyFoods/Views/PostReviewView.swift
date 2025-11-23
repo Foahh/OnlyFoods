@@ -259,8 +259,8 @@ private struct ReviewPhotosSection: View {
   @State private var previewImages: [UIImage] = []
   @State private var selectedPhotoItems: [PhotosPickerItem] = []
   @State private var selectedUIImage: UIImage? = nil
-  @State private var showImagePicker = false
-  @State private var selectedImageSource: UIImagePickerController.SourceType = .photoLibrary
+  @State private var showGalleryPicker = false
+  @State private var showCameraPicker = false
   @State private var showCameraUnavailableAlert = false
   @State private var cameraAlertMessage = ""
 
@@ -282,14 +282,17 @@ private struct ReviewPhotosSection: View {
         photoActions
       }
     }
-    .sheet(isPresented: $showImagePicker) {
-      ImagePicker(
-        selectedSource: selectedImageSource,
-        image: $selectedUIImage
-      )
+    .sheet(isPresented: $showGalleryPicker) {
+      ImagePickerGallery(image: $selectedUIImage)
+    }
+    .fullScreenCover(isPresented: $showCameraPicker) {
+      ImagePickerCamera(image: $selectedUIImage)
+        .ignoresSafeArea(.all)
     }
     .alert("Camera Not Available", isPresented: $showCameraUnavailableAlert) {
-      Button("OK", role: .cancel) {}
+      Button("OK", role: .cancel) {
+        showCameraUnavailableAlert = false
+      }
     } message: {
       Text(cameraAlertMessage)
     }
@@ -312,11 +315,22 @@ private struct ReviewPhotosSection: View {
     }
     .onChange(of: selectedUIImage) { _, newValue in
       guard let uiImage = newValue else { return }
+
+      // Check if we've reached the maximum number of photos
+      guard previewImages.count < 5 else {
+        // Reset selectedUIImage to allow future selections
+        selectedUIImage = nil
+        return
+      }
+
       previewImages.append(uiImage)
       if let data = uiImage.jpegData(compressionQuality: 0.8) {
         let base64 = data.base64EncodedString()
         images.append(base64)
       }
+
+      // Reset selectedUIImage after processing
+      selectedUIImage = nil
     }
   }
 
@@ -335,22 +349,29 @@ private struct ReviewPhotosSection: View {
       }
 
       Button {
+        // Check if we've reached the photo limit
+        if previewImages.count >= 5 {
+          cameraAlertMessage = "You can only add up to 5 photos. Remove some photos to add more."
+          showCameraUnavailableAlert = true
+          return
+        }
+
         if UIImagePickerController.isSourceTypeAvailable(.camera) {
-          selectedImageSource = .camera
           selectedUIImage = nil
-          showImagePicker = true
+          showCameraPicker = true
         } else {
           cameraAlertMessage = "Use a device with a camera or select from library."
           showCameraUnavailableAlert = true
         }
       } label: {
-        Label("Capture Photo", systemImage: "camera.fill")
+        Label("Take a Photo", systemImage: "camera.fill")
           .frame(maxWidth: .infinity)
           .padding()
           .background(Color.accentColor.opacity(0.15))
           .foregroundColor(Color.accentColor)
           .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
       }
+      .disabled(previewImages.count >= 5)
     }
   }
 
