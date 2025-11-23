@@ -59,12 +59,31 @@ struct RestaurantMapView: View {
           OpenInMapsButton(restaurant: restaurant)
         }
       }
-      .sheet(isPresented: $showLookAround) {
-        if let scene = lookAroundScene {
-          LookAroundView(scene: scene)
-            .presentationDetents([.large])
+      .overlay(alignment: .bottom) {
+        if showLookAround, let scene = lookAroundScene {
+          ZStack(alignment: .topTrailing) {
+            LookAroundView(scene: scene)
+              .frame(height: 300)
+              .clipShape(RoundedRectangle(cornerRadius: 16))
+
+            Button(action: {
+              showLookAround = false
+            }) {
+              Image(systemName: "xmark")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(.primary)
+                .frame(width: 28, height: 28)
+                .background(.ultraThinMaterial, in: Circle())
+            }
+            .buttonStyle(.plain)
+            .padding(12)
+          }
+          .padding(20)
+          .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 10)
+          .transition(.move(edge: .bottom).combined(with: .opacity))
         }
       }
+      .animation(.spring(response: 0.4, dampingFraction: 0.8), value: showLookAround)
     }
   }
 }
@@ -165,14 +184,11 @@ struct LookAroundButton: View {
     }) {
       HStack(spacing: 8) {
         if isCheckingLookAround {
-          ProgressView()
-            .scaleEffect(0.8)
+          ProgressView().scaleEffect(0.8)
         } else {
           Image(systemName: "binoculars.fill")
             .font(.headline)
         }
-        Text("Look Around")
-          .font(.subheadline.weight(.semibold))
       }
       .padding(.horizontal, 16)
       .padding(.vertical, 12)
@@ -212,7 +228,6 @@ struct LookAroundButton: View {
           isCheckingLookAround = false
           if let scene = scene {
             lookAroundScene = scene
-            showLookAround = true
           } else if let error = error {
             print("Look Around unavailable: \(error.localizedDescription)")
           }
@@ -228,6 +243,9 @@ struct LookAroundView: UIViewControllerRepresentable {
 
   func makeUIViewController(context: Context) -> MKLookAroundViewController {
     let viewController = MKLookAroundViewController(scene: scene)
+
+    viewController.view.layer.cornerRadius = 16
+    viewController.view.layer.masksToBounds = true
     return viewController
   }
 
