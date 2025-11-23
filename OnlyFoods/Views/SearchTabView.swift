@@ -69,6 +69,7 @@ struct SearchTabView: View {
       .searchable(text: $searchService.searchText, prompt: "Search restaurants...")
       .overlay(alignment: .bottom) {
         FilterFloatingButton(
+          isMap: false,
           restaurantCount: restaurantCount,
           hasActiveFilters: searchService.hasActiveFilters,
           action: { showFilterSheet = true }

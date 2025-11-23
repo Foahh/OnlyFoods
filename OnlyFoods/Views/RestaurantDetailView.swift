@@ -431,7 +431,7 @@ struct RestaurantDetailLocationContactSection: View {
                   mapItem.name = restaurantName
                   mapItem.openInMaps()
                 }) {
-                  Image(systemName: "map.fill")
+                  Image(systemName: "location.fill")
                     .font(.headline)
                     .padding(10)
                     .background(Color.blue.opacity(0.15))

@@ -69,46 +69,14 @@ struct ProfileHeaderView: View {
 
   var body: some View {
     VStack(spacing: 16) {
-      ZStack {
-        Circle()
-          .fill(Color.blue.opacity(0.2))
-          .frame(width: 120, height: 120)
-
-        if let avatar = user.avatar {
-          AsyncImage(url: URL(string: avatar)) { image in
-            image
-              .resizable()
-              .aspectRatio(contentMode: .fill)
-          } placeholder: {
-            Circle()
-              .fill(Color.gray.opacity(0.2))
-              .overlay {
-                ProgressView()
-              }
-          }
-          .frame(width: 110, height: 110)
-          .clipShape(Circle())
-          .overlay(
-            Circle()
-              .stroke(Color.white, lineWidth: 3)
-          )
-        } else {
-          Circle()
-            .fill(Color.gray.opacity(0.2))
-            .frame(width: 110, height: 110)
-            .overlay {
-              Image(systemName: "person.fill")
-                .font(.system(size: 50))
-                .foregroundColor(.gray)
-            }
-            .overlay(
-              Circle()
-                .stroke(Color.white, lineWidth: 3)
-            )
+      Circle()
+        .fill(Color.blue.opacity(0.75))
+        .frame(width: 110, height: 110)
+        .overlay {
+          Image(systemName: "person.fill")
+            .font(.system(size: 50))
+            .foregroundColor(.white)
         }
-      }
-      .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
-
       VStack(spacing: 4) {
         Text(user.username)
           .font(.title)
@@ -182,13 +150,7 @@ struct LogoutButton: View {
       .foregroundColor(.white)
       .frame(maxWidth: .infinity)
       .padding(.vertical, 14)
-      .background(
-        LinearGradient(
-          colors: [Color.red, Color.red.opacity(0.8)],
-          startPoint: .leading,
-          endPoint: .trailing
-        )
-      )
+      .background(Color.red)
       .cornerRadius(12)
     }
     .padding(.horizontal, 16)
@@ -205,26 +167,6 @@ struct ProfileEmptyStateView: View {
       Spacer()
 
       VStack(spacing: 20) {
-        ZStack {
-          Circle()
-            .fill(Color.blue.opacity(0.2))
-            .frame(width: 120, height: 120)
-
-          Circle()
-            .fill(Color.blue.opacity(0.1))
-            .frame(width: 110, height: 110)
-            .overlay {
-              Image(systemName: "person.fill")
-                .font(.system(size: 50))
-                .foregroundColor(.blue)
-            }
-            .overlay(
-              Circle()
-                .stroke(Color.white, lineWidth: 3)
-            )
-        }
-        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
-
         VStack(spacing: 8) {
           Text("Welcome to OnlyFoods")
             .font(.title2)

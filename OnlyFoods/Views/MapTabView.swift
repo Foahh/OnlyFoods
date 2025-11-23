@@ -47,6 +47,7 @@ struct MapTabView: View {
       .navigationBarTitleDisplayMode(.large)
       .overlay(alignment: .bottom) {
         FilterFloatingButton(
+          isMap: true,
           restaurantCount: filteredRestaurants.count,
           hasActiveFilters: searchService.hasActiveFilters,
           action: { showFilterSheet = true }
@@ -139,11 +140,11 @@ struct MapContent: View {
     .onMapCameraChange(frequency: .continuous) { context in
       // Update visible region immediately for smooth UI
       visibleRegion = context.region
-      
+
       // Debounce the region update for filtering
       debounceTask?.cancel()
       debounceTask = Task {
-        try? await Task.sleep(nanoseconds: 300_000_000) // 300ms debounce
+        try? await Task.sleep(nanoseconds: 300_000_000)  // 300ms debounce
         if !Task.isCancelled {
           await MainActor.run {
             debouncedRegion = context.region
@@ -170,7 +171,7 @@ struct MapRestaurantFilter {
   private static func getMaxPins(for region: MKCoordinateRegion?) -> Int {
     guard let region = region else { return 30 }
     let span = region.span.latitudeDelta
-    
+
     // Level 1: Extremely zoomed out (country/continent view)
     if span > 0.5 { return 15 }
     // Level 2: Very zoomed out (region view)
@@ -262,7 +263,7 @@ struct MapRestaurantFilter {
     users: [UserModel]
   ) -> [RestaurantModel] {
     guard !restaurants.isEmpty else { return [] }
-    
+
     // If we have fewer restaurants than the limit, return all
     guard restaurants.count > maxPins else {
       return applySpatialClustering(
@@ -273,7 +274,8 @@ struct MapRestaurantFilter {
     }
 
     // Calculate scores for each restaurant
-    let scoredRestaurants = restaurants.map { restaurant -> (restaurant: RestaurantModel, score: Double) in
+    let scoredRestaurants = restaurants.map {
+      restaurant -> (restaurant: RestaurantModel, score: Double) in
       let rating = restaurantService.getRatingDetails(
         for: restaurant.id,
         from: reviews
@@ -319,9 +321,10 @@ struct MapRestaurantFilter {
     }
 
     // Sort by score (descending) and take top candidates
-    let topCandidates = scoredRestaurants
+    let topCandidates =
+      scoredRestaurants
       .sorted { $0.score > $1.score }
-      .prefix(maxPins * 2) // Get 2x candidates for clustering
+      .prefix(maxPins * 2)  // Get 2x candidates for clustering
       .map { $0.restaurant }
 
     // Apply spatial clustering to avoid overlapping pins
@@ -340,7 +343,7 @@ struct MapRestaurantFilter {
     maxPins: Int
   ) -> [RestaurantModel] {
     guard !restaurants.isEmpty else { return [] }
-    
+
     // Adaptive cluster threshold based on zoom level (in degrees)
     // More zoomed in = smaller threshold = more clusters
     // Fine-tuned for better spatial distribution
@@ -359,42 +362,42 @@ struct MapRestaurantFilter {
       // Very zoomed in: minimal clustering
       clusterThreshold = span * 0.02
     }
-    
+
     var clusters: [[RestaurantModel]] = []
     var usedIndices = Set<Int>()
-    
+
     for (index, restaurant) in restaurants.enumerated() {
       if usedIndices.contains(index) { continue }
-      
+
       var cluster = [restaurant]
       usedIndices.insert(index)
-      
+
       // Find nearby restaurants to cluster
       for (otherIndex, otherRestaurant) in restaurants.enumerated() {
         if usedIndices.contains(otherIndex) { continue }
         if index == otherIndex { continue }
-        
+
         let latDiff = abs(restaurant.latitude - otherRestaurant.latitude)
         let lonDiff = abs(restaurant.longitude - otherRestaurant.longitude)
-        
+
         // Simple distance check (approximate)
         if latDiff < clusterThreshold && lonDiff < clusterThreshold {
           cluster.append(otherRestaurant)
           usedIndices.insert(otherIndex)
         }
       }
-      
+
       clusters.append(cluster)
-      
+
       // Early exit if we have enough clusters
       if clusters.count >= maxPins {
         break
       }
     }
-    
+
     // Select the first restaurant from each cluster (already sorted by priority)
     let result = clusters.prefix(maxPins).compactMap { $0.first }
-    
+
     return Array(result)
   }
 }

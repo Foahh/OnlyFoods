@@ -9,6 +9,7 @@ import CoreLocation
 import SwiftUI
 
 struct FilterFloatingButton: View {
+  let isMap: Bool
   let restaurantCount: Int
   let hasActiveFilters: Bool
   let action: () -> Void
@@ -21,7 +22,7 @@ struct FilterFloatingButton: View {
           .symbolEffect(.bounce, value: hasActiveFilters)
 
         if restaurantCount > 0 {
-          Text("\(restaurantCount) Found")
+          Text("\(restaurantCount)" + (isMap ? "Shown" : "Found"))
             .font(.system(size: 16, weight: .bold))
         } else {
           Text("Filters")
@@ -149,7 +150,7 @@ struct DistanceFilterSection: View {
   var body: some View {
     Section("Distance") {
       Picker("Distance", selection: $searchService.selectedDistance) {
-        Text("Any distance").tag(DistanceFilter?.none)
+        Text("Infinite").tag(DistanceFilter?.none)
         ForEach(DistanceFilter.allCases, id: \.self) { distance in
           Text(distance.displayName).tag(DistanceFilter?.some(distance))
         }
