@@ -53,7 +53,7 @@ struct AuthView: View {
           Button(role: .cancel) {
             dismiss()
           } label: {
-            Image(systemName: "xmark")
+            Image(systemName: "chevron.left")
           }
         }
         ToolbarItem(placement: .confirmationAction) {

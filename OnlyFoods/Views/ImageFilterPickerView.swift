@@ -159,7 +159,7 @@ private struct FilterPickerToolbar: ToolbarContent {
   var body: some ToolbarContent {
     ToolbarItem(placement: .cancellationAction) {
       Button(role: .cancel, action: onCancel) {
-        Image(systemName: "xmark")
+        Image(systemName: "chevron.left")
       }
     }
     ToolbarItem(placement: .confirmationAction) {

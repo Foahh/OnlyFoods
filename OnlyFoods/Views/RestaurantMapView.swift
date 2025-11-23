@@ -44,7 +44,7 @@ struct RestaurantMapView: View {
           Button(action: {
             dismiss()
           }) {
-            Image(systemName: "xmark")
+            Image(systemName: "chevron.left")
           }
         }
         ToolbarItem(placement: .navigationBarTrailing) {

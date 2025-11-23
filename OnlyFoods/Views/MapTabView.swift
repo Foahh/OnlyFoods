@@ -62,7 +62,18 @@ struct MapTabView: View {
         )
       }
       .sheet(item: $selectedRestaurant) { restaurant in
-        RestaurantDetailView(restaurant: restaurant)
+        NavigationStack {
+          RestaurantDetailView(restaurant: restaurant)
+            .toolbar {
+              ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                  selectedRestaurant = nil
+                } label: {
+                  Image(systemName: "chevron.left")
+                }
+              }
+            }
+        }
       }
       .onAppear {
         initializeMapRegion()
@@ -407,6 +418,7 @@ struct MapPinView: View {
 
   private var pinColor: Color {
     guard rating.reviewCount > 0 else { return .gray }
+    
     if rating.averageRating >= 4.0 {
       return .green
     } else if rating.averageRating >= 3.0 {
@@ -422,14 +434,14 @@ struct MapPinView: View {
       if rating.reviewCount > 0 {
         HStack(spacing: 3) {
           Image(systemName: "star.fill")
-            .font(.system(size: 7, weight: .semibold))
+            .font(.system(size: 8, weight: .semibold))
             .foregroundStyle(.white)
           Text(String(format: "%.1f", rating.averageRating))
-            .font(.system(size: 9, weight: .semibold))
+            .font(.system(size: 10, weight: .semibold))
             .foregroundStyle(.white)
         }
-        .padding(.horizontal, 5)
-        .padding(.vertical, 2)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 3)
         .background(
           Capsule()
             .fill(pinColor)
@@ -440,7 +452,7 @@ struct MapPinView: View {
 
       // Pin icon
       Image(systemName: "mappin.circle.fill")
-        .font(.system(size: 24, weight: .medium))
+        .font(.system(size: 20, weight: .medium))
         .foregroundStyle(pinColor)
         .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 1)
     }

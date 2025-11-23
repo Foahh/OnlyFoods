@@ -673,7 +673,7 @@ private struct CancelButton: View {
 
   var body: some View {
     Button(role: .cancel, action: action) {
-      Image(systemName: "xmark")
+      Image(systemName: "chevron.left")
     }
   }
 }
