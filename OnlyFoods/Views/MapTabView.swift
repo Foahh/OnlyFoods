@@ -171,16 +171,26 @@ struct MapRestaurantFilter {
     guard let region = region else { return 30 }
     let span = region.span.latitudeDelta
     
-    // Very zoomed out: show fewer pins
-    if span > 0.1 { return 20 }
-    // Moderately zoomed out
-    if span > 0.05 { return 40 }
-    // Zoomed in: show more pins
-    if span > 0.01 { return 80 }
-    // Very zoomed in: show even more
-    if span > 0.005 { return 160 }
-    // Extremely zoomed in: show all
-    return 500
+    // Level 1: Extremely zoomed out (country/continent view)
+    if span > 0.5 { return 15 }
+    // Level 2: Very zoomed out (region view)
+    if span > 0.2 { return 25 }
+    // Level 3: Zoomed out (city-wide view)
+    if span > 0.1 { return 35 }
+    // Level 4: Moderately zoomed out (district view)
+    if span > 0.05 { return 50 }
+    // Level 5: Medium zoom (neighborhood view)
+    if span > 0.025 { return 75 }
+    // Level 6: Zoomed in (street block view)
+    if span > 0.01 { return 100 }
+    // Level 7: Very zoomed in (multiple buildings)
+    if span > 0.005 { return 150 }
+    // Level 8: Extremely zoomed in (single building area)
+    if span > 0.002 { return 250 }
+    // Level 9: Ultra zoomed in (building level)
+    if span > 0.001 { return 400 }
+    // Level 10: Maximum zoom (show all visible)
+    return 1000
   }
 
   static func filter(
@@ -331,10 +341,24 @@ struct MapRestaurantFilter {
   ) -> [RestaurantModel] {
     guard !restaurants.isEmpty else { return [] }
     
-    // Cluster threshold based on zoom level (in degrees)
+    // Adaptive cluster threshold based on zoom level (in degrees)
     // More zoomed in = smaller threshold = more clusters
+    // Fine-tuned for better spatial distribution
     let span = region.span.latitudeDelta
-    let clusterThreshold = span * 0.01 // ~1% of visible area
+    let clusterThreshold: Double
+    if span > 0.1 {
+      // Very zoomed out: larger clusters
+      clusterThreshold = span * 0.08
+    } else if span > 0.01 {
+      // Medium zoom: moderate clusters
+      clusterThreshold = span * 0.05
+    } else if span > 0.002 {
+      // Zoomed in: smaller clusters
+      clusterThreshold = span * 0.03
+    } else {
+      // Very zoomed in: minimal clustering
+      clusterThreshold = span * 0.02
+    }
     
     var clusters: [[RestaurantModel]] = []
     var usedIndices = Set<Int>()
