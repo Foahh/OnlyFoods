@@ -51,7 +51,7 @@ struct RestaurantMapView: View {
           OpenInMapsButton(restaurant: restaurant)
         }
       }
-      .overlay(alignment: .bottomTrailing) {
+      .overlay(alignment: showLookAround ? .top : .bottom) {
         MapBottomToolbar(
           restaurant: restaurant,
           cameraPosition: $cameraPosition,
@@ -60,7 +60,8 @@ struct RestaurantMapView: View {
           lookAroundScene: $lookAroundScene,
           isCheckingLookAround: $isCheckingLookAround
         )
-        .padding(.trailing, 15)
+        .padding(.vertical, 20)
+        .padding(.top, showLookAround ? 20 : 0)
       }
       .overlay(alignment: .bottom) {
         if showLookAround, let scene = lookAroundScene {
@@ -87,12 +88,7 @@ struct RestaurantMapContent: View {
   var body: some View {
     Map(position: $cameraPosition) {
       UserAnnotation()
-      Annotation(
-        restaurant.name,
-        coordinate: restaurantCoordinate
-      ) {
-        RestaurantMapPinView()
-      }
+      Marker(restaurant.name, coordinate: restaurantCoordinate)
     }
     .mapStyle(.standard)
   }
@@ -195,22 +191,40 @@ struct MapBottomToolbar: View {
   }
 
   var body: some View {
-    VStack(spacing: 35) {
+    HStack(spacing: 25) {
+      Button {
+        centerOnRestaurantPin()
+      } label: {
+        Image(systemName: "mappin.and.ellipse")
+          .frame(minWidth: 44, minHeight: 44)
+          .contentShape(Rectangle())
+      }
+
       Button {
         centerOnUserLocation()
       } label: {
         Image(systemName: "location.fill")
+          .frame(minWidth: 44, minHeight: 44)
+          .contentShape(Rectangle())
       }
 
       Button {
         Task {
+          if showLookAround {
+            showLookAround = false
+            return
+          }
           await handleLookAroundTap()
         }
       } label: {
         if isCheckingLookAround {
           ProgressView().scaleEffect(0.8)
+            .frame(minWidth: 44, minHeight: 44)
+            .contentShape(Rectangle())
         } else {
           Image(systemName: "binoculars.fill")
+            .frame(minWidth: 44, minHeight: 44)
+            .contentShape(Rectangle())
         }
       }
       .disabled(isCheckingLookAround)
@@ -218,10 +232,10 @@ struct MapBottomToolbar: View {
         await checkLookAroundAvailability()
       }
     }
+    .padding(.vertical, 5)
+    .padding(.horizontal, 10)
     .font(.title3)
     .foregroundStyle(.primary)
-    .padding(.vertical, 20)
-    .padding(.horizontal, 12)
     .modifier(GlassEffectInteractiveModifier(tint: nil))
   }
 
@@ -262,13 +276,25 @@ struct MapBottomToolbar: View {
     }
   }
 
+  private func centerOnRestaurantPin() {
+    let region = MKCoordinateRegion(
+      center: restaurantCoordinate,
+      span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+    )
+    withAnimation {
+      cameraPosition = .region(region)
+    }
+  }
+
   private func centerOnUserLocation() {
     let userCoordinate = locationManager.region.center
     let region = MKCoordinateRegion(
       center: userCoordinate,
       span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
     )
-    cameraPosition = .region(region)
+    withAnimation {
+      cameraPosition = .region(region)
+    }
   }
 }
 
