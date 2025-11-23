@@ -125,9 +125,7 @@ struct RestaurantDetailView: View {
             distanceToRestaurant: distanceToRestaurant,
             onToggleVisited: {
               requireAuthentication {
-                if isNearby {
-                  toggleVisitedState()
-                }
+                toggleVisitedState()
               }
             },
             onToggleFavorite: {
