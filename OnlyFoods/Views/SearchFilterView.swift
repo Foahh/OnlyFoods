@@ -103,6 +103,7 @@ struct SearchFilterView: View {
             searchService.clearFilters()
           } label: {
             Image(systemName: "xmark")
+            .tint(.red)
           }
           .accessibilityLabel("Clear Filters")
           .disabled(!searchService.hasActiveFilters)
