@@ -49,17 +49,3 @@ struct ConfirmButton: View {
     }
   }
 }
-
-struct IsSearchableModifier: ViewModifier {
-  let isSearchable: Bool
-  let prompt: String
-  @Binding var searchText: String
-
-  func body(content: Content) -> some View {
-    if isSearchable {
-      content.searchable(text: $searchText, prompt: prompt)
-    } else {
-      content
-    }
-  }
-}
