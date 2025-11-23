@@ -1,38 +1,33 @@
 [
   {
     "id": "mock-restaurant-001",
-    "name": "Mock Restaurant 001",
-    "latitude": 22.2819,
-    "longitude": 114.1583,
+    "name": "CPD-3.29",
+    "latitude": 22.28327926991032,
+    "longitude": 114.13394646105853,
     "images": [
-      "https://picsum.photos/200/300",
-      "https://picsum.photos/200/300",
-      "https://picsum.photos/200/300",
-      "https://picsum.photos/200/300"
+      "https://its.hku.hk/wp-content/uploads/IMG_6781.jpg",
+      "https://its.hku.hk/wp-content/uploads/IMG_6780.jpg"
     ],
-    "doorImage": "https://picsum.photos/200/300",
+    "doorImage": "https://its.hku.hk/wp-content/uploads/FullSizeRender-6.jpg",
     "categories": [
-      "Chinese",
-      "Cantonese",
-      "Dim Sum"
+      "HKU",
+      "Dining",
+      "Coffee"
     ],
     "services": [
       "Wi-Fi",
-      "Alcoholic Drinks",
       "Phone Reservation",
-      "Private Room",
-      "10% Service Charge"
+      "Private Room"
     ],
     "paymentMethods": [
       "Visa",
       "Master",
       "Cash",
-      "UnionPay",
       "Alipay",
       "WeChat Pay"
     ],
-    "contactPhone": "21234567",
-    "addressString": "123 Main Street, Central, Hong Kong",
+    "contactPhone": "+852 2859 2149",
+    "addressString": "Room CPD-3.28, Central Podium Level 3, The Jockey Club Tower, Centennial Campus, The University of Hong Kong, Pokfulam Road, Hong Kong",
     "priceLevel": 2,
     "businessHours": [
       {

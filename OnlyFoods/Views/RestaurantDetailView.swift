@@ -9,6 +9,7 @@ import MapKit
 import SwiftData
 import SwiftUI
 import UIKit
+import CoreLocation
 
 struct RestaurantDetailView: View {
   @Environment(\.modelContext) private var modelContext
@@ -20,6 +21,7 @@ struct RestaurantDetailView: View {
   @State private var showAddReview = false
   @State private var currentRestaurant: RestaurantModel
   @State private var showAuthView = false
+  @State private var locationManager = LocationManager()
 
   private var currentUser: UserModel? {
     userManager.currentUser
@@ -67,6 +69,31 @@ struct RestaurantDetailView: View {
     RestaurantService.shared.getVisitedCount(for: currentRestaurant.id, from: users)
   }
 
+  private var isNearby: Bool {
+    let restaurantCoordinate = CLLocationCoordinate2D(
+      latitude: currentRestaurant.latitude,
+      longitude: currentRestaurant.longitude
+    )
+    let userCoordinate = locationManager.region.center
+    let distance = DistanceCalculator.distance(
+      from: userCoordinate,
+      to: restaurantCoordinate
+    )
+    return distance <= 100.0
+  }
+
+  private var distanceToRestaurant: Double {
+    let restaurantCoordinate = CLLocationCoordinate2D(
+      latitude: currentRestaurant.latitude,
+      longitude: currentRestaurant.longitude
+    )
+    let userCoordinate = locationManager.region.center
+    return DistanceCalculator.distance(
+      from: userCoordinate,
+      to: restaurantCoordinate
+    )
+  }
+
   private func phoneURL(for phone: String) -> URL? {
     let sanitized = phone.filter { "0123456789+".contains($0) }
     guard !sanitized.isEmpty else { return nil }
@@ -93,9 +120,13 @@ struct RestaurantDetailView: View {
             isFavorite: currentUser?.isFavorite(restaurantID: currentRestaurant.id) ?? false,
             favoriteCount: favoriteCount,
             visitedCount: visitedCount,
+            isNearby: isNearby,
+            distanceToRestaurant: distanceToRestaurant,
             onToggleVisited: {
               requireAuthentication {
-                toggleVisitedState()
+                if isNearby {
+                  toggleVisitedState()
+                }
               }
             },
             onToggleFavorite: {
@@ -211,6 +242,8 @@ struct RestaurantDetailHeaderSection: View {
   let isFavorite: Bool
   let favoriteCount: Int
   let visitedCount: Int
+  let isNearby: Bool
+  let distanceToRestaurant: Double
   let onToggleVisited: () -> Void
   let onToggleFavorite: () -> Void
 
@@ -225,22 +258,37 @@ struct RestaurantDetailHeaderSection: View {
         RatingView(rating: rating)
       }
 
-      HStack(spacing: 12) {
-        RestaurantDetailActionButton(
-          title: "Visited",
-          systemImage: hasVisited ? "checkmark.circle.fill" : "checkmark.circle",
-          isFilled: hasVisited,
-          activeColor: .blue,
-          onTap: onToggleVisited
-        )
+      VStack(spacing: 8) {
+        HStack(spacing: 12) {
+          RestaurantDetailActionButton(
+            title: "Visited",
+            systemImage: hasVisited ? "checkmark.circle.fill" : "checkmark.circle",
+            isFilled: hasVisited,
+            activeColor: .blue,
+            isDisabled: !isNearby,
+            onTap: onToggleVisited
+          )
 
-        RestaurantDetailActionButton(
-          title: "Favorite",
-          systemImage: isFavorite ? "heart.fill" : "heart",
-          isFilled: isFavorite,
-          activeColor: .red,
-          onTap: onToggleFavorite
-        )
+          RestaurantDetailActionButton(
+            title: "Favorite",
+            systemImage: isFavorite ? "heart.fill" : "heart",
+            isFilled: isFavorite,
+            activeColor: .red,
+            onTap: onToggleFavorite
+          )
+        }
+        
+        if !isNearby {
+          HStack(spacing: 6) {
+            Image(systemName: "location.slash")
+              .font(.caption)
+              .foregroundStyle(.orange)
+            Text("You're \(DistanceCalculator.formatDistance(distanceToRestaurant)) away.")
+              .font(.caption)
+              .foregroundStyle(.secondary)
+          }
+          .padding(.horizontal, 4)
+        }
       }
 
       RestaurantDetailSocialStatsView(
@@ -314,7 +362,24 @@ struct RestaurantDetailActionButton: View {
   let systemImage: String
   let isFilled: Bool
   let activeColor: Color
+  let isDisabled: Bool
   let onTap: () -> Void
+
+  init(
+    title: String,
+    systemImage: String,
+    isFilled: Bool,
+    activeColor: Color,
+    isDisabled: Bool = false,
+    onTap: @escaping () -> Void
+  ) {
+    self.title = title
+    self.systemImage = systemImage
+    self.isFilled = isFilled
+    self.activeColor = activeColor
+    self.isDisabled = isDisabled
+    self.onTap = onTap
+  }
 
   var body: some View {
     Button(action: onTap) {
@@ -326,10 +391,20 @@ struct RestaurantDetailActionButton: View {
       }
       .frame(maxWidth: .infinity)
       .frame(height: 50)
-      .foregroundStyle(isFilled ? .white : activeColor)
-      .background(isFilled ? activeColor : activeColor.opacity(0.1))
+      .foregroundStyle(
+        isDisabled
+          ? .secondary
+          : (isFilled ? .white : activeColor)
+      )
+      .background(
+        isDisabled
+          ? Color(.systemGray5)
+          : (isFilled ? activeColor : activeColor.opacity(0.1))
+      )
       .clipShape(Capsule())
+      .opacity(isDisabled ? 0.6 : 1.0)
     }
+    .disabled(isDisabled)
   }
 }
 
