@@ -80,7 +80,7 @@ struct RestaurantDetailView: View {
       from: userCoordinate,
       to: restaurantCoordinate
     )
-    return distance <= 100.0
+    return distance <= 25.0
   }
 
   private var distanceToRestaurant: Double {
@@ -268,7 +268,6 @@ struct RestaurantDetailHeaderSection: View {
             systemImage: hasVisited ? "checkmark.circle.fill" : "checkmark.circle",
             isFilled: hasVisited,
             activeColor: .blue,
-            isDisabled: !isNearby,
             onTap: onToggleVisited
           )
 
@@ -283,7 +282,7 @@ struct RestaurantDetailHeaderSection: View {
 
         if !isNearby {
           HStack(spacing: 6) {
-            Image(systemName: "location.slash")
+            Image(systemName: "location")
               .font(.caption)
               .foregroundStyle(.orange)
             Text("You're \(DistanceCalculator.formatDistance(distanceToRestaurant)) away.")
