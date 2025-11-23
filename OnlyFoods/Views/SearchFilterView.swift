@@ -110,10 +110,10 @@ struct SearchFilterView: View {
         }
         ToolbarItem(placement: .navigationBarTrailing) {
           ConfirmButton(
-            action: {
-              dismiss()
-            }, icon: "checkmark"
-          )
+            icon: "checkmark"
+          ) {
+            dismiss()
+          }
           .accessibilityLabel("Apply Filters")
         }
       }

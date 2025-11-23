@@ -58,9 +58,9 @@ struct AuthView: View {
         }
         ToolbarItem(placement: .confirmationAction) {
           ConfirmButton(
-            action: authenticate,
             icon: "arrow.right",
-            disabled: username.isEmpty
+            disabled: username.isEmpty,
+            action: authenticate,
           )
         }
       }
