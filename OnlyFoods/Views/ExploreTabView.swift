@@ -14,6 +14,7 @@ struct ExploreTabView: View {
   @Query private var users: [UserModel]
   @StateObject private var restaurantService = RestaurantService.shared
   @StateObject private var timeService = TimeService.shared
+  @State private var displayedRestaurants: [RestaurantModel] = []
 
   var body: some View {
     NavigationStack {
@@ -21,12 +22,12 @@ struct ExploreTabView: View {
         if restaurantService.isLoading {
           ProgressView()
             .scaleEffect(1.5)
-        } else if restaurantService.restaurants.isEmpty {
+        } else if displayedRestaurants.isEmpty {
           ExploreEmptyStateView(hasActiveFilters: false)
         } else {
           ScrollView {
             LazyVStack(spacing: 16) {
-              ForEach(restaurantService.restaurants) { restaurant in
+              ForEach(displayedRestaurants) { restaurant in
                 NavigationLink {
                   RestaurantDetailView(restaurant: restaurant)
                 } label: {
@@ -39,13 +40,54 @@ struct ExploreTabView: View {
             .padding(.vertical, 8)
           }
           .refreshable {
-            restaurantService.loadRestaurants()
+            await refreshRestaurants()
           }
         }
       }
       .navigationTitle("Explore")
       .navigationBarTitleDisplayMode(.large)
+      .onAppear {
+        processRestaurants()
+      }
+      .onChange(of: restaurantService.restaurants.count) { _, _ in
+        if !restaurantService.isLoading {
+          processRestaurants()
+        }
+      }
+      .onChange(of: restaurantService.isLoading) { _, newValue in
+        if !newValue {
+          processRestaurants()
+        }
+      }
     }
+  }
+
+  private func processRestaurants() {
+    guard !restaurantService.restaurants.isEmpty else {
+      displayedRestaurants = []
+      return
+    }
+
+    // Randomize restaurants
+    var randomized = restaurantService.restaurants.shuffled()
+
+    // Sort by open status (open first, closed second)
+    randomized.sort { restaurant1, restaurant2 in
+      let isOpen1 = restaurant1.isOpen(at: timeService.currentTime)
+      let isOpen2 = restaurant2.isOpen(at: timeService.currentTime)
+      return isOpen1 && !isOpen2
+    }
+
+    displayedRestaurants = randomized
+  }
+
+  private func refreshRestaurants() async {
+    restaurantService.loadRestaurants()
+    // Wait for loading to complete
+    while restaurantService.isLoading {
+      try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+    }
+    processRestaurants()
   }
 }
 
