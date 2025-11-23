@@ -15,6 +15,7 @@ struct RestaurantMapView: View {
   @State private var showLookAround = false
   @State private var lookAroundScene: MKLookAroundScene?
   @State private var isCheckingLookAround = false
+  @State private var locationManager = LocationManager()
   @Environment(\.dismiss) private var dismiss
 
   init(restaurant: RestaurantModel) {
@@ -32,19 +33,10 @@ struct RestaurantMapView: View {
 
   var body: some View {
     NavigationStack {
-      ZStack {
-        RestaurantMapContent(
-          restaurant: restaurant,
-          cameraPosition: $cameraPosition
-        )
-
-        MapOverlayView(
-          restaurant: restaurant,
-          showLookAround: $showLookAround,
-          lookAroundScene: $lookAroundScene,
-          isCheckingLookAround: $isCheckingLookAround
-        )
-      }
+      RestaurantMapContent(
+        restaurant: restaurant,
+        cameraPosition: $cameraPosition
+      )
       .navigationTitle(restaurant.name)
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
@@ -59,28 +51,21 @@ struct RestaurantMapView: View {
           OpenInMapsButton(restaurant: restaurant)
         }
       }
+      .overlay(alignment: .bottomTrailing) {
+        MapBottomToolbar(
+          restaurant: restaurant,
+          cameraPosition: $cameraPosition,
+          locationManager: locationManager,
+          showLookAround: $showLookAround,
+          lookAroundScene: $lookAroundScene,
+          isCheckingLookAround: $isCheckingLookAround
+        )
+        .padding(.trailing, 15)
+      }
       .overlay(alignment: .bottom) {
         if showLookAround, let scene = lookAroundScene {
-          ZStack(alignment: .topTrailing) {
-            LookAroundView(scene: scene)
-              .frame(height: 300)
-              .clipShape(RoundedRectangle(cornerRadius: 16))
-
-            Button(action: {
-              showLookAround = false
-            }) {
-              Image(systemName: "xmark")
-                .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(.primary)
-                .frame(width: 28, height: 28)
-                .background(.ultraThinMaterial, in: Circle())
-            }
-            .buttonStyle(.plain)
-            .padding(12)
-          }
-          .padding(20)
-          .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 10)
-          .transition(.move(edge: .bottom).combined(with: .opacity))
+          LookAroundOverlayView(scene: scene, showLookAround: $showLookAround)
+            .transition(.move(edge: .bottom).combined(with: .opacity))
         }
       }
       .animation(.spring(response: 0.4, dampingFraction: 0.8), value: showLookAround)
@@ -113,37 +98,6 @@ struct RestaurantMapContent: View {
   }
 }
 
-struct MapOverlayView: View {
-  let restaurant: RestaurantModel
-  @Binding var showLookAround: Bool
-  @Binding var lookAroundScene: MKLookAroundScene?
-  @Binding var isCheckingLookAround: Bool
-
-  private var restaurantCoordinate: CLLocationCoordinate2D {
-    CLLocationCoordinate2D(
-      latitude: restaurant.latitude,
-      longitude: restaurant.longitude
-    )
-  }
-
-  var body: some View {
-    VStack {
-      Spacer()
-      HStack {
-        Spacer()
-        LookAroundButton(
-          showLookAround: $showLookAround,
-          lookAroundScene: $lookAroundScene,
-          isCheckingLookAround: $isCheckingLookAround,
-          coordinate: restaurantCoordinate
-        )
-        .padding(.trailing, 20)
-        .padding(.bottom, 20)
-      }
-    }
-  }
-}
-
 struct OpenInMapsButton: View {
   let restaurant: RestaurantModel
 
@@ -170,33 +124,104 @@ struct OpenInMapsButton: View {
   }
 }
 
-struct LookAroundButton: View {
+struct LookAroundView: UIViewControllerRepresentable {
+  let scene: MKLookAroundScene
+
+  func makeUIViewController(context: Context) -> MKLookAroundViewController {
+    let viewController = MKLookAroundViewController(scene: scene)
+
+    viewController.view.layer.cornerRadius = 16
+    viewController.view.layer.masksToBounds = true
+    return viewController
+  }
+
+  func updateUIViewController(_ uiViewController: MKLookAroundViewController, context: Context) {
+    // No updates needed
+  }
+}
+
+struct LookAroundOverlayView: View {
+  let scene: MKLookAroundScene
+  @Binding var showLookAround: Bool
+
+  var body: some View {
+    ZStack(alignment: .topTrailing) {
+      LookAroundView(scene: scene)
+        .frame(height: 300)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+
+      Button(action: {
+        showLookAround = false
+      }) {
+        Image(systemName: "xmark")
+          .font(.system(size: 13, weight: .medium))
+          .foregroundStyle(.primary)
+          .frame(width: 28, height: 28)
+          .background(.ultraThinMaterial, in: Circle())
+      }
+      .buttonStyle(.plain)
+      .padding(12)
+    }
+    .padding(20)
+    .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 10)
+  }
+}
+
+struct RestaurantMapPinView: View {
+  var body: some View {
+    VStack(spacing: 0) {
+      Image(systemName: "mappin.circle.fill")
+        .font(.system(size: 32, weight: .medium))
+        .foregroundStyle(.red)
+        .shadow(color: Color.black.opacity(0.3), radius: 4, x: 0, y: 2)
+    }
+  }
+}
+
+// https://www.youtube.com/watch?v=4RWJlgimoc8
+struct MapBottomToolbar: View {
+  let restaurant: RestaurantModel
+  @Binding var cameraPosition: MapCameraPosition
+  let locationManager: LocationManager
   @Binding var showLookAround: Bool
   @Binding var lookAroundScene: MKLookAroundScene?
   @Binding var isCheckingLookAround: Bool
-  let coordinate: CLLocationCoordinate2D
+
+  private var restaurantCoordinate: CLLocationCoordinate2D {
+    CLLocationCoordinate2D(
+      latitude: restaurant.latitude,
+      longitude: restaurant.longitude
+    )
+  }
 
   var body: some View {
-    Button(action: {
-      Task {
-        await handleLookAroundTap()
+    VStack(spacing: 35) {
+      Button {
+        centerOnUserLocation()
+      } label: {
+        Image(systemName: "location.fill")
       }
-    }) {
-      HStack(spacing: 8) {
+
+      Button {
+        Task {
+          await handleLookAroundTap()
+        }
+      } label: {
         if isCheckingLookAround {
           ProgressView().scaleEffect(0.8)
         } else {
           Image(systemName: "binoculars.fill")
-            .font(.headline)
         }
       }
-      .padding(.horizontal, 16)
-      .padding(.vertical, 12)
+      .disabled(isCheckingLookAround)
+      .task {
+        await checkLookAroundAvailability()
+      }
     }
-    .disabled(isCheckingLookAround)
-    .task {
-      await checkLookAroundAvailability()
-    }
+    .font(.title3)
+    .foregroundStyle(.primary)
+    .padding(.vertical, 20)
+    .padding(.horizontal, 12)
     .modifier(GlassEffectInteractiveModifier(tint: nil))
   }
 
@@ -220,7 +245,7 @@ struct LookAroundButton: View {
       isCheckingLookAround = true
     }
 
-    let request = MKLookAroundSceneRequest(coordinate: coordinate)
+    let request = MKLookAroundSceneRequest(coordinate: restaurantCoordinate)
 
     await withCheckedContinuation { continuation in
       request.getSceneWithCompletionHandler { scene, error in
@@ -236,32 +261,14 @@ struct LookAroundButton: View {
       }
     }
   }
-}
 
-struct LookAroundView: UIViewControllerRepresentable {
-  let scene: MKLookAroundScene
-
-  func makeUIViewController(context: Context) -> MKLookAroundViewController {
-    let viewController = MKLookAroundViewController(scene: scene)
-
-    viewController.view.layer.cornerRadius = 16
-    viewController.view.layer.masksToBounds = true
-    return viewController
-  }
-
-  func updateUIViewController(_ uiViewController: MKLookAroundViewController, context: Context) {
-    // No updates needed
-  }
-}
-
-struct RestaurantMapPinView: View {
-  var body: some View {
-    VStack(spacing: 0) {
-      Image(systemName: "mappin.circle.fill")
-        .font(.system(size: 32, weight: .medium))
-        .foregroundStyle(.red)
-        .shadow(color: Color.black.opacity(0.3), radius: 4, x: 0, y: 2)
-    }
+  private func centerOnUserLocation() {
+    let userCoordinate = locationManager.region.center
+    let region = MKCoordinateRegion(
+      center: userCoordinate,
+      span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+    )
+    cameraPosition = .region(region)
   }
 }
 
