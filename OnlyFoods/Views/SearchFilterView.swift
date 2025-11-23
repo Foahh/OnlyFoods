@@ -9,7 +9,6 @@ import CoreLocation
 import SwiftUI
 
 struct SearchFilterButton: View {
-  let isMap: Bool
   let restaurantCount: Int
   let hasActiveSearch: Bool
   let action: () -> Void
@@ -20,8 +19,8 @@ struct SearchFilterButton: View {
         Image(systemName: "line.3.horizontal.decrease.circle.fill")
           .font(.system(size: 18, weight: .semibold))
 
-        if hasActiveSearch || restaurantCount > 0 {
-          Text("\(restaurantCount) " + (isMap ? "Shown" : "Found"))
+        if hasActiveSearch {
+          Text("\(restaurantCount) " + "Found")
             .font(.system(size: 16, weight: .bold))
         } else {
           Text("Filters")

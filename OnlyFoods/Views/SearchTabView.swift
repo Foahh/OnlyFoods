@@ -69,7 +69,6 @@ struct SearchTabView: View {
       .searchable(text: $searchService.searchText, prompt: "Search restaurants...")
       .overlay(alignment: .bottom) {
         SearchFilterButton(
-          isMap: false,
           restaurantCount: restaurantCount,
           hasActiveSearch: searchService.hasActiveSearch,
           action: { showSearchFilterView = true }
