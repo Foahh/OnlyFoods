@@ -18,7 +18,7 @@ struct SearchTabView: View {
   @StateObject private var restaurantService = RestaurantService.shared
   @StateObject private var timeService = TimeService.shared
   @State private var locationManager = LocationManager()
-  @State private var showFilterSheet = false
+  @State private var showSearchFilterView = false
   @State private var keyboardHeight: CGFloat = 0
   @State private var keyboardObservers: [NSObjectProtocol] = []
 
@@ -68,18 +68,18 @@ struct SearchTabView: View {
       .navigationBarTitleDisplayMode(.large)
       .searchable(text: $searchService.searchText, prompt: "Search restaurants...")
       .overlay(alignment: .bottom) {
-        FilterFloatingButton(
+        SearchFilterButton(
           isMap: false,
           restaurantCount: restaurantCount,
           hasActiveSearch: searchService.hasActiveSearch,
-          action: { showFilterSheet = true }
+          action: { showSearchFilterView = true }
         )
         .padding(.bottom, 20)
         .offset(y: -keyboardHeight)
         .animation(.spring(response: 0.3, dampingFraction: 0.8), value: keyboardHeight)
       }
-      .sheet(isPresented: $showFilterSheet) {
-        FilterSheet(
+      .sheet(isPresented: $showSearchFilterView) {
+        SearchFilterView(
           searchService: searchService,
           restaurantService: restaurantService
         )

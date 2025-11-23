@@ -22,7 +22,7 @@ struct MapTabView: View {
   @State private var debounceTask: Task<Void, Never>?
   @State private var selectedRestaurant: RestaurantModel?
   @State private var cameraPosition: MapCameraPosition = .automatic
-  @State private var showFilterSheet = false
+  @State private var showSearchFilterView = false
 
   var body: some View {
     NavigationStack {
@@ -46,15 +46,15 @@ struct MapTabView: View {
       .navigationTitle("Map")
       .navigationBarTitleDisplayMode(.large)
       .overlay(alignment: .bottom) {
-        FilterFloatingButton(
+        SearchFilterButton(
           isMap: true,
           restaurantCount: filteredRestaurants.count,
           hasActiveSearch: searchService.hasActiveSearch,
-          action: { showFilterSheet = true }
+          action: { showSearchFilterView = true }
         ).padding(.bottom, 20)
       }
-      .sheet(isPresented: $showFilterSheet) {
-        FilterSheet(
+      .sheet(isPresented: $showSearchFilterView) {
+        SearchFilterView(
           searchService: searchService,
           restaurantService: restaurantService,
           showSortSection: false,

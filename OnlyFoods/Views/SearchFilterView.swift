@@ -1,5 +1,5 @@
 //
-//  FilterSheet.swift
+//  SearchFilterView.swift
 //  OnlyFoods
 //
 //  Created by Foahh on 2025/11/21.
@@ -8,7 +8,7 @@
 import CoreLocation
 import SwiftUI
 
-struct FilterFloatingButton: View {
+struct SearchFilterButton: View {
   let isMap: Bool
   let restaurantCount: Int
   let hasActiveSearch: Bool
@@ -38,7 +38,7 @@ struct FilterFloatingButton: View {
   }
 }
 
-struct FilterSheet: View {
+struct SearchFilterView: View {
   @ObservedObject var searchService: SearchService
   @ObservedObject var restaurantService: RestaurantService
   var showSortSection: Bool = true
@@ -468,7 +468,7 @@ struct FilterableSection<Content: View>: View {
 }
 
 #Preview {
-  FilterSheet(
+  SearchFilterView(
     searchService: SearchService(),
     restaurantService: RestaurantService.shared
   )
