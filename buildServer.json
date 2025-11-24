@@ -14,6 +14,6 @@
 	],
 	"workspace": "/Users/fn/Documents/OnlyFoods/OnlyFoods.xcodeproj/project.xcworkspace",
 	"build_root": "/Users/fn/Library/Developer/Xcode/DerivedData/OnlyFoods-gfekqrrnmxqufefmworjclxfejcd",
-	"scheme": "OnlyFoods",
+	"scheme": "Release",
 	"kind": "xcode"
 }
