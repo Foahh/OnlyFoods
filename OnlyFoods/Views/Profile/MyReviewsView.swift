@@ -20,7 +20,7 @@ struct MyReviewsView: View {
 
   var userReviews: [ReviewModel] {
     guard let user = currentUser else { return [] }
-    return reviews.filter { $0.userID == user.id }
+    return reviews.filter { $0.user?.id == user.id }
       .sorted { $0.timestamp > $1.timestamp }
   }
 

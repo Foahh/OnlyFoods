@@ -12,7 +12,7 @@ import SwiftData
 final class ReviewModel {
   @Attribute(.unique) var id: UUID
   var restaurantID: String
-  var userID: UUID
+  @Relationship(inverse: \UserModel.reviews) var user: UserModel?
   var rating: Int  // 1-5 stars
   var comment: String
   var images: [String]  // URLs or asset names
@@ -21,7 +21,7 @@ final class ReviewModel {
   init(
     id: UUID = UUID(),
     restaurantID: String,
-    userID: UUID,
+    user: UserModel?,
     rating: Int,
     comment: String,
     images: [String] = [],
@@ -29,7 +29,7 @@ final class ReviewModel {
   ) {
     self.id = id
     self.restaurantID = restaurantID
-    self.userID = userID
+    self.user = user
     self.rating = rating
     self.comment = comment
     self.images = images

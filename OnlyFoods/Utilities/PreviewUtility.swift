@@ -60,7 +60,7 @@ struct PreviewUtility {
     [
       ReviewModel(
         restaurantID: "mock-restaurant-001",
-        userID: user.id,
+        user: user,
         rating: 5,
         comment: "Great food and service!",
         images: [],
@@ -68,7 +68,7 @@ struct PreviewUtility {
       ),
       ReviewModel(
         restaurantID: "mock-restaurant-001",
-        userID: user.id,
+        user: user,
         rating: 4,
         comment: "Good experience overall.",
         images: [],

@@ -626,11 +626,11 @@ struct ReviewRowView: View {
   @State private var showDeleteConfirmation = false
 
   var reviewUser: UserModel? {
-    users.first { $0.id == review.userID }
+    review.user
   }
 
   var isOwnReview: Bool {
-    currentUser?.id == review.userID
+    review.user?.id == currentUser?.id
   }
 
   var body: some View {

@@ -49,7 +49,7 @@ struct PostReviewView: View {
   private func submitReview() {
     let review = ReviewModel(
       restaurantID: restaurant.id,
-      userID: user.id,
+      user: user,
       rating: rating,
       comment: comment.trimmingCharacters(in: .whitespacesAndNewlines),
       images: images
