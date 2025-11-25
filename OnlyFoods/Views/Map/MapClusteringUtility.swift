@@ -16,26 +16,50 @@ extension UIGraphicsImageRenderer {
 
     let totalCount = annotations.count
     let highRatedCount = annotations.highRatedRestaurantCount
+    let poorRatedCount = annotations.poorRatedRestaurantCount
 
     let countText = "\(totalCount)"
 
     return renderer.image { _ in
-      // Green background circle
-      UIColor(red: 126 / 255.0, green: 211 / 255.0, blue: 33 / 255.0, alpha: 1.0).setFill()
+      // Gray background circle
+      UIColor.gray.setFill()
       UIBezierPath(ovalIn: rect).fill()
 
-      // Orange pie slice for high-rated restaurants
-      if highRatedCount > 0 {
+      let center = CGPoint(x: 20, y: 20)
+      let radius: CGFloat = 20
+      var currentAngle: CGFloat = 0
+
+      // Orange pie slice for poor-rated restaurants
+      if poorRatedCount > 0 {
         UIColor(red: 245 / 255.0, green: 166 / 255.0, blue: 35 / 255.0, alpha: 1.0).setFill()
+        let poorAngle = (CGFloat.pi * 2.0 * CGFloat(poorRatedCount)) / CGFloat(totalCount)
         let piePath = UIBezierPath()
         piePath.addArc(
-          withCenter: CGPoint(x: 20, y: 20),
-          radius: 20,
-          startAngle: 0,
-          endAngle: (CGFloat.pi * 2.0 * CGFloat(highRatedCount)) / CGFloat(totalCount),
+          withCenter: center,
+          radius: radius,
+          startAngle: currentAngle,
+          endAngle: currentAngle + poorAngle,
           clockwise: true
         )
-        piePath.addLine(to: CGPoint(x: 20, y: 20))
+        piePath.addLine(to: center)
+        piePath.close()
+        piePath.fill()
+        currentAngle += poorAngle
+      }
+
+      // Green pie slice for high-rated restaurants
+      if highRatedCount > 0 {
+        UIColor(red: 126 / 255.0, green: 211 / 255.0, blue: 33 / 255.0, alpha: 1.0).setFill()
+        let highAngle = (CGFloat.pi * 2.0 * CGFloat(highRatedCount)) / CGFloat(totalCount)
+        let piePath = UIBezierPath()
+        piePath.addArc(
+          withCenter: center,
+          radius: radius,
+          startAngle: currentAngle,
+          endAngle: currentAngle + highAngle,
+          clockwise: true
+        )
+        piePath.addLine(to: center)
         piePath.close()
         piePath.fill()
       }
@@ -56,6 +80,14 @@ extension Sequence where Element == MKAnnotation {
       self
       .compactMap { $0 as? RestaurantAnnotation }
       .filter { $0.rating.reviewCount > 0 && $0.rating.averageRating >= 4.0 }
+      .count
+  }
+
+  var poorRatedRestaurantCount: Int {
+    return
+      self
+      .compactMap { $0 as? RestaurantAnnotation }
+      .filter { $0.rating.reviewCount > 0 && $0.rating.averageRating < 2.5 }
       .count
   }
 }
