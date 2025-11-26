@@ -51,7 +51,7 @@ private struct FilterPreviewView: View {
   let filter: ImageFilter
 
   var body: some View {
-    if let filteredImage = ImageFilterService.applyFilter(filter, to: image) {
+    if let filteredImage = ImageFilterUtility.applyFilter(filter, to: image) {
       Image(uiImage: filteredImage)
         .resizable()
         .scaledToFit()
@@ -118,7 +118,7 @@ private struct FilterOptionImageView: View {
   let isSelected: Bool
 
   var body: some View {
-    if let filteredPreview = ImageFilterService.applyFilter(filter, to: image) {
+    if let filteredPreview = ImageFilterUtility.applyFilter(filter, to: image) {
       Image(uiImage: filteredPreview)
         .resizable()
         .scaledToFill()

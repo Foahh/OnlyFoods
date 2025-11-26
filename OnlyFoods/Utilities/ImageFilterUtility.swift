@@ -1,5 +1,5 @@
 //
-//  ImageFilterService.swift
+//  ImageFilterUtility.swift
 //  OnlyFoods
 //
 //  Created by Foahh on 2025/11/23.
@@ -44,7 +44,7 @@ enum ImageFilter: String, CaseIterable, Identifiable {
   }
 }
 
-struct ImageFilterService {
+struct ImageFilterUtility {
   static let context = CIContext(options: [.useSoftwareRenderer: false])
 
   static func applyFilter(_ filter: ImageFilter, to image: UIImage) -> UIImage? {

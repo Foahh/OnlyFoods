@@ -185,7 +185,7 @@ private struct PhotoThumbnailItem: View {
   let onRemove: () -> Void
 
   private var displayImage: UIImage {
-    ImageFilterService.applyFilter(filter, to: image) ?? image
+    ImageFilterUtility.applyFilter(filter, to: image) ?? image
   }
 
   var body: some View {
@@ -466,7 +466,7 @@ private struct ReviewPhotosSection: View {
     originalImages.append(uiImage)
     imageFilters.append(.none)
 
-    if let filteredImage = ImageFilterService.applyFilter(.none, to: uiImage),
+    if let filteredImage = ImageFilterUtility.applyFilter(.none, to: uiImage),
       let data = filteredImage.jpegData(compressionQuality: 0.8)
     {
       let base64 = data.base64EncodedString()
@@ -503,7 +503,7 @@ private struct ReviewPhotosSection: View {
     }
 
     // Apply filter and update base64 image
-    if let filteredImage = ImageFilterService.applyFilter(filter, to: originalImages[index]),
+    if let filteredImage = ImageFilterUtility.applyFilter(filter, to: originalImages[index]),
       let data = filteredImage.jpegData(compressionQuality: 0.8)
     {
       let base64 = data.base64EncodedString()
